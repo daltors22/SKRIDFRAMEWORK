@@ -1,0 +1,8 @@
+node_modules/
+data/
+venv/
+
+package-lock.json
+
+.database_password
+.DS_Store
