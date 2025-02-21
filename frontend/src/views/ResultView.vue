@@ -106,7 +106,7 @@ const fetchMeiMetadata = async () => {
     const descriptions = Array.from(descriptionElems).map(elem => elem.textContent.trim());
 
     console.log("📜 Descriptions extraites :", descriptions); // ✅ Log pour vérifier
-
+    
     // Concatène avec un double saut de ligne "\n\n"
     description.value = descriptions.join("\n\n");
     } else {

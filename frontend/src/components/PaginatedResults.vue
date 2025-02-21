@@ -149,6 +149,11 @@ const formatTitle = (filename) => {
   overflow-x: hidden;
 }
 
+.grid-item:hover {
+  cursor: pointer;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+}
+
 .score-preview {
   margin-top: 10px;
   text-align: center;
