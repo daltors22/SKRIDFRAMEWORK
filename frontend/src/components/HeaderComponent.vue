@@ -11,6 +11,7 @@
                   <li class="nav-item"><router-link class="nav-link" to="/plus">En savoir plus</router-link></li>
                   <li class="nav-item"><router-link class="nav-link" to="/references">Références</router-link></li>
                   <li class="nav-item"><router-link class="nav-link" to="/collections">Collections</router-link></li>
+                  <li class="nav-item"><router-link class="nav-link" to="/searchinterface">Recherche</router-link></li>
               </ul>
           </div>
       </div>

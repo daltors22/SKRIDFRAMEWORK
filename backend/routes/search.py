@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from database import driver  # Import du driver Neo4j
+import os
 
 search_routes = Blueprint("search", __name__)  # 🔥 Correction du nom du Blueprint
 
