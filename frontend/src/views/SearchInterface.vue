@@ -8,7 +8,7 @@
     <!-- Toasts -->
     <div v-if="showHelpToast" class="toast custom-toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
       <div class="d-flex">
-        <a href="/help">
+        <a href="#">
           <div class="toast-body text-center text-white">
             Aide/astuce
             <i class="bi bi-lightbulb-fill me-2"></i>
@@ -21,7 +21,7 @@
     <!-- Microphone Search Toast -->
     <div v-if="showMicroToast" class="toast1 custom-toast1 align-items-center text-bg border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
       <div class="d-flex">
-        <a href="/formulateQueryFromMicrophone">
+        <a href="#">
           <div class="toast-body text-center text-white">
             <p>Micro</p>
             <i class="bi bi-mic-fill"></i>
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Music score section -->
-    <div class="content-wrapper" style="align-items: center;">
+    <div class="content-wrapper d-flex flex-column" style="align-items: center !important; justify-content: center !important;">
       <div class="search-pattern">
         <h1>Rechercher un motif musical</h1>
         <div id="music-score"></div>
@@ -356,5 +356,9 @@ export default {
 }
 .piano-keys .key {
   cursor: pointer;
+}
+.rhythm-modif button {
+  width: 50px;
+  height: auto;
 }
 </style>

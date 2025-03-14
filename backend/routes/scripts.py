@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import subprocess
 
-script_routes = Blueprint("scripts", __name__)  # ✅ Définition correcte du Blueprint
+script_routes = Blueprint("scripts", __name__)  # Définition correcte du Blueprint
 
 @script_routes.route("/compileFuzzy", methods=["POST"])
 def compile_fuzzy():
