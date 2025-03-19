@@ -49,8 +49,8 @@
             <span>Volume</span>
             <input type="range" v-model="volume" min="0" max="1" value="0.5" step="any" />
           </div>
-          <div class='octave-modif'>
-            <div class='octave-modif-bt-div'>
+          <div class="octave-modif">
+            <div class="octave-modif-bt-div">
               <button @click="changeOctave(-1)" class="btn btn-outline-secondary text-white octave-modif-bt" data-key="<" id="octave-minus"><span>Octave - (c)</span></button>
               <button @click="changeOctave(1)" class="btn btn-outline-secondary text-white octave-modif-bt" data-key=">" id="octave-plus"><span>Octave + (v)</span></button>
             </div>
@@ -59,6 +59,12 @@
           <div class="column keys-checkbox">
             <span>Touches</span>
             <input type="checkbox" checked />
+          </div>
+          <!-- Bouton pour basculer la config clavier -->
+          <div class="keyboard-config">
+            <button @click="toggleKeyboardConfig" class="btn btn-secondary">
+              Config clavier : {{ keyboardConfig }}
+            </button>
           </div>
         </header>
 
@@ -83,37 +89,37 @@
           </button>
 
           <div class="rhythm-modif">
-            <button class="rhythm-modif-bt" data-key="w" id="whole-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('w')" data-key="w" id="whole-bt">
               <img src="/src/assets/public/notes_pics/1.png" height="50px" alt="Whole" />
             </button>
-            <button class="rhythm-modif-bt" data-key="hd" id="half-dotted-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('hd')" data-key="hd" id="half-dotted-bt">
               <img src="/src/assets/public/notes_pics/2d.png" height="50px" alt="Dotted half" />
             </button>
-            <button class="rhythm-modif-bt" data-key="h" id="half-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('h')" data-key="h" id="half-bt">
               <img src="/src/assets/public/notes_pics/2.png" height="50px" alt="Half" />
             </button>
-            <button class="rhythm-modif-bt" data-key="qd" id="quarter-dotted-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('qd')" data-key="qd" id="quarter-dotted-bt">
               <img src="/src/assets/public/notes_pics/4d.png" height="50px" alt="Dotted quarter" />
             </button>
-            <button class="rhythm-modif-bt" data-key="q" id="quarter-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('q')" data-key="q" id="quarter-bt">
               <img src="/src/assets/public/notes_pics/4.png" height="50px" alt="Quarter" />
             </button>
-            <button class="rhythm-modif-bt" data-key="8d" id="8th-dotted-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8d')" data-key="8d" id="8th-dotted-bt">
               <img src="/src/assets/public/notes_pics/8d.png" height="50px" alt="Dotted 8-th" />
             </button>
-            <button class="rhythm-modif-bt" data-key="8" id="8th-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8')" id="8th-bt">
               <img src="/src/assets/public/notes_pics/8.png" height="50px" alt="8-th" />
             </button>
-            <button class="rhythm-modif-bt" data-key="16d" id="16th-dotted-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16d')" data-key="16d" id="16th-dotted-bt">
               <img src="/src/assets/public/notes_pics/16d.png" height="50px" alt="Dotted 16-th" />
             </button>
-            <button class="rhythm-modif-bt" data-key="16" id="16th-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16')" data-key="16" id="16th-bt">
               <img src="/src/assets/public/notes_pics/16.png" height="50px" alt="16-th" />
             </button>
-            <button class="rhythm-modif-bt" data-key="32d" id="32th-dotted-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32d')" data-key="32d" id="32th-dotted-bt">
               <img src="/src/assets/public/notes_pics/32d.png" height="50px" alt="Dotted 32-th" />
             </button>
-            <button class="rhythm-modif-bt" data-key="32" id="32th-bt">
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32')" data-key="32" id="32th-bt">
               <img src="/src/assets/public/notes_pics/32.png" height="50px" alt="32-th" />
             </button>
           </div>
@@ -214,12 +220,17 @@
 </template>
 
 <script>
+import * as VF from 'vexflow';
+const { Renderer, Stave, StaveNote, Formatter, Accidental, Dot } = VF;
+import { playNote, stopNote } from '../utils/audioUtils';
+
 export default {
   data() {
     return {
       volume: 0.5,
       octave: 4,
       melody: [],
+      pressedTimestamp: null,
       showHelpToast: true,
       showMicroToast: false,
       selectedCollection: '',
@@ -259,31 +270,191 @@ export default {
       alpha: 0,
       toastVisible: false,
       toastTitle: '',
-      toastMessage: ''
+      toastMessage: '',
+      // Configuration clavier
+      keyboardConfig: 'azerty',
+      azertyMapping: {
+        'q': 'C4',
+        'z': 'C#4',
+        's': 'D4',
+        'e': 'D#4',
+        'd': 'E4',
+        'f': 'F4',
+        't': 'F#4',
+        'g': 'G4',
+        'y': 'G#4',
+        'h': 'A4',
+        'u': 'A#4',
+        'j': 'B4',
+        'k': 'C5',
+        'o': 'C#5',
+        'l': 'D5',
+        'p': 'D#5',
+        'm': 'E5',
+        'ù': 'F5',
+        ')': 'F#5',
+        '*': 'G5',
+
+      },
+      qwertyMapping: {
+        'a': 'C4',
+        'w': 'C#4',
+        's': 'D4',
+        'e': 'D#4',
+        'd': 'E4',
+        'f': 'F4',
+        't': 'F#4',
+        'g': 'G4',
+        'y': 'G#4',
+        'h': 'A4',
+        'u': 'A#4',
+        'j': 'B4',
+        'k': 'C5'
+      },
+      // Pour limiter les accords (nombre de sons simultanés)
+      currentlyPlayingNotes: []
     };
   },
+  computed: {
+    currentMapping() {
+      return this.keyboardConfig === 'azerty' ? this.azertyMapping : this.qwertyMapping;
+    }
+  },
+  mounted() {
+    this.initVexFlow();
+    document.addEventListener('keydown', this.handleGlobalKeyDown);
+    document.addEventListener('keyup', this.handleGlobalKeyUp);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleGlobalKeyDown);
+    document.removeEventListener('keyup', this.handleGlobalKeyUp);
+  },
   methods: {
+    // INITIALISATION DE VEXFLOW
+    initVexFlow() {
+      const div = document.getElementById('music-score');
+      if (!div) {
+        console.error("L'élément 'music-score' est introuvable");
+        return;
+      }
+      this.renderer = new Renderer(div, Renderer.Backends.SVG);
+      const width = 500, height = 200;
+      this.renderer.resize(width, height);
+      this.context = this.renderer.getContext();
+      this.stave = new Stave(10, 40, width - 20);
+      this.stave.addClef('treble').setContext(this.context).draw();
+    },
+    // MISE À JOUR DE LA PORTÉE
+    updateStaff() {
+      const svg = document.querySelector('#music-score svg');
+      if (svg) {
+        svg.innerHTML = '';
+      }
+      this.stave.setContext(this.context).draw();
+      if (this.melody.length > 0) {
+        Formatter.FormatAndDraw(this.context, this.stave, this.melody);
+      }
+    },
+    // AJOUTE UNE NOTE À LA MÉLODIE
+    addNote(noteStr, duration = 'q') {
+      let key = noteStr.replace(/([A-G])(#?)(\d)/, (match, p1, p2, p3) => {
+        return p1.toLowerCase() + (p2 ? '#' : '') + '/' + p3;
+      });
+      const note = new StaveNote({
+        keys: [key],
+        duration: duration
+      });
+      if (noteStr.includes('#')) {
+        note.addModifier(new Accidental("#"), 0);
+      }
+      this.melody.push(note);
+      this.updateStaff();
+    },
+    // GESTION DES TOUCHES DU PIANO (souris)
+    keyDown(key) {
+      console.log(`Appuyer sur la touche: ${key.id}`);
+      // Bloquer si 2 sons sont déjà joués simultanément
+      if (this.currentlyPlayingNotes.length > 1) {
+        this.playNote = !this.playNote;
+        console.log("Accord bloqué : trop de notes simultanées.");
+        return;
+      }
+      this.pressedTimestamp = Date.now();
+      playNote(key.id);
+      this.currentlyPlayingNotes.push(key.id);
+    },
+    keyUp(key) {
+      console.log(`Relâcher la touche: ${key.id}`);
+      const elapsed = Date.now() - this.pressedTimestamp;
+      this.pressedTimestamp = null;
+      let duration = 'q';
+      if (elapsed < 150) {
+        duration = '32';
+      } else if (elapsed < 300) {
+        duration = '16';
+      } else if (elapsed < 600) {
+        duration = '8';
+      } else if (elapsed < 900) {
+        duration = 'q';
+      } else if (elapsed < 1200) {
+        duration = 'h';
+      } else {
+        duration = 'w';
+      }
+      stopNote(key.id);
+      const index = this.currentlyPlayingNotes.indexOf(key.id);
+      if (index > -1) {
+        this.currentlyPlayingNotes.splice(index, 1);
+      }
+      this.addNote(key.id, duration);
+    },
+    // MODIFICATION DE LA DERNIÈRE NOTE
+    changeLastNoteRhythm(newDuration) {
+      if (this.melody.length === 0) {
+        console.warn("Aucune note à modifier.");
+        return;
+      }
+      const lastNote = this.melody.pop();
+      const keys = lastNote.getKeys();
+      const isRest = lastNote.noteType === 'r';
+      let newNote;
+      if (isRest) {
+        newNote = new StaveNote({
+          keys: ['b/4'],
+          duration: newDuration,
+          type: 'r'
+        });
+      } else {
+        newNote = new StaveNote({
+          keys: keys,
+          duration: newDuration,
+          clef: 'treble',
+          auto_stem: true
+        });
+        if (keys[0].includes('#')) {
+          newNote.addModifier(new Accidental("#"), 0);
+        }
+      }
+      this.melody.push(newNote);
+      this.updateStaff();
+    },
+    // MÉTHODES EXISTANTES
     clearAll() {
       this.melody = [];
+      this.updateStaff();
     },
     removeLastNote() {
       this.melody.pop();
+      this.updateStaff();
     },
     playMelody() {
       console.log('Jouer la mélodie');
+      // Ajoutez ici la logique pour lire les sons des notes de la mélodie
     },
     changeOctave(diff) {
       this.octave += diff;
       if (this.octave < 1) this.octave = 1;
       if (this.octave > 6) this.octave = 6;
-    },
-    keyDown(key) {
-      console.log(`Appuyer sur la touche: ${key.id}`);
-      // Ajouter la logique de la touche
-    },
-    keyUp(key) {
-      console.log(`Relâcher la touche: ${key.id}`);
-      // Ajouter la logique pour relâcher la touche
     },
     searchExact() {
       this.toastVisible = true;
@@ -296,7 +467,7 @@ export default {
     searchWithTolerance() {
       this.toastVisible = true;
       this.toastTitle = 'Recherche approchée';
-      this.toastMessage = 'Vous effectuez une recherche approchée sur la hauteur des notes.';
+      this.toastMessage = 'Recherche tolérante sur la hauteur des notes.';
       setTimeout(() => {
         this.toastVisible = false;
       }, 3000);
@@ -304,13 +475,13 @@ export default {
     searchWithRhythmTolerance() {
       this.toastVisible = true;
       this.toastTitle = 'Recherche approximative';
-      this.toastMessage = 'Vous effectuez une recherche approximative sur la durée des notes.';
+      this.toastMessage = 'Recherche tolérante sur le rythme des notes.';
       setTimeout(() => {
         this.toastVisible = false;
       }, 3000);
     },
     toggleAdvancedOptions() {
-      this.showAdvancedOptions = !this.showAdvancedOptions;
+      console.log("Basculer les options avancées");
     },
     closeToast(toastType) {
       if (toastType === 'help') {
@@ -321,11 +492,45 @@ export default {
     },
     searchWithAdvancedOptions() {
       console.log('Recherche avec options avancées');
-      // Logique de recherche avec options avancées
+      // Logique de recherche avancée
+    },
+    // GESTION DES TOUCHES DU CLAVIER (globale)
+    handleGlobalKeyDown(event) {
+      const tag = event.target.tagName.toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+      const mapping = this.currentMapping;
+      const note = mapping[event.key];
+      if (note && !event.repeat) {
+        this.keyDown({ id: note });
+      }
+    },
+    handleGlobalKeyUp(event) {
+      const tag = event.target.tagName.toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+      const mapping = this.currentMapping;
+      const note = mapping[event.key];
+      if (note) {
+        this.keyUp({ id: note });
+      }
+    },
+    // Permet de basculer entre AZERTY et QWERTY
+    toggleKeyboardConfig() {
+      this.keyboardConfig = this.keyboardConfig === 'azerty' ? 'qwerty' : 'azerty';
+      console.log("Configuration du clavier : " + this.keyboardConfig);
     }
+  },
+  computed: {
+    currentMapping() {
+      return this.keyboardConfig === 'azerty' ? this.azertyMapping : this.qwertyMapping;
+    }
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleGlobalKeyDown);
+    document.removeEventListener('keyup', this.handleGlobalKeyUp);
   }
 };
 </script>
+
 
 <style scoped>
 .clear_buttons {
@@ -360,5 +565,8 @@ export default {
 .rhythm-modif button {
   width: 50px;
   height: auto;
+}
+.keyboard-config {
+  margin-left: 20px;
 }
 </style>

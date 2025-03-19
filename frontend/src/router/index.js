@@ -3,7 +3,8 @@ import HomeView from '../views/HomeView.vue';
 import PlusView from '../views/PlusView.vue';
 import ReferencesView from '../views/ReferencesView.vue';
 import SearchInterface from '../views/SearchInterface.vue';
-import CollectionsView from '../views/CollectionsView.vue';
+import CollectionsView from '../views/CollectionsView.vue'
+
 
 
 const routes = [
