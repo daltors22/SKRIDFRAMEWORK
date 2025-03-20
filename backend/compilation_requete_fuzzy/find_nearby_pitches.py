@@ -1,4 +1,4 @@
-from degree_computation import convert_note_to_sharp
+from .degree_computation import convert_note_to_sharp
 from math import ceil, floor, log2
 
 def frequency_to_note(frequency):

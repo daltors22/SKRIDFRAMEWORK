@@ -3,7 +3,7 @@ from pydub.generators import Sine
 import numpy as np
 import os
 
-from note import Note
+from .note import Note
 
 # Frequency mapping for notes (A4 = 440 Hz)
 note_frequencies = {

@@ -1,11 +1,10 @@
 <template>
   <div>
-    <!-- Search bar -->
+    <!-- Barre de recherche et notifications -->
     <div class="searchbar-box">
       <h1 class="searchbar-title">Rechercher dans le contenu des partitions</h1>
     </div>
 
-    <!-- Toasts -->
     <div v-if="showHelpToast" class="toast custom-toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
       <div class="d-flex">
         <a href="#">
@@ -18,7 +17,6 @@
       </div>
     </div>
 
-    <!-- Microphone Search Toast -->
     <div v-if="showMicroToast" class="toast1 custom-toast1 align-items-center text-bg border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
       <div class="d-flex">
         <a href="#">
@@ -30,29 +28,30 @@
       </div>
     </div>
 
-    <!-- Music score section -->
-    <div class="content-wrapper d-flex flex-column" style="align-items: center !important; justify-content: center !important;">
+    <!-- Section de saisie musicale -->
+    <div class="content-wrapper d-flex flex-column mt-5" style="align-items: center; justify-content: center;">
       <div class="search-pattern">
         <h1>Rechercher un motif musical</h1>
+        <!-- Zone où la partition en cours (saisie) est affichée -->
         <div id="music-score"></div>
         <div class="clear_buttons">
-          <button @click="clearAll" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_all">Supprimer tout</button>
-          <button @click="removeLastNote" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_last_note">Supprimer la dernière note</button>
-          <button @click="playMelody" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="play_melody">Jouer la mélodie</button>
+          <button @click="clearAll" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;">Supprimer tout</button>
+          <button @click="removeLastNote" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;">Supprimer la dernière note</button>
+          <button @click="playMelody" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;">Jouer la mélodie</button>
         </div>
       </div>
 
-      <!-- Volume and Octave control -->
+      <!-- Contrôles (Volume, Octave, touches, piano, rythme) -->
       <div class="wrapper">
         <header>
           <div class="column volume-slider">
             <span>Volume</span>
-            <input type="range" v-model="volume" min="0" max="1" value="0.5" step="any" />
+            <input type="range" v-model="volume" min="0" max="1" step="any" />
           </div>
           <div class="octave-modif">
             <div class="octave-modif-bt-div">
-              <button @click="changeOctave(-1)" class="btn btn-outline-secondary text-white octave-modif-bt" data-key="<" id="octave-minus"><span>Octave - (c)</span></button>
-              <button @click="changeOctave(1)" class="btn btn-outline-secondary text-white octave-modif-bt" data-key=">" id="octave-plus"><span>Octave + (v)</span></button>
+              <button @click="changeOctave(-1)" class="btn btn-outline-secondary text-white octave-modif-bt" id="octave-minus"><span>Octave - (c)</span></button>
+              <button @click="changeOctave(1)" class="btn btn-outline-secondary text-white octave-modif-bt" id="octave-plus"><span>Octave + (v)</span></button>
             </div>
             <label id="octave-lb" class="white-label">{{ octave }}</label>
           </div>
@@ -60,7 +59,6 @@
             <span>Touches</span>
             <input type="checkbox" checked />
           </div>
-          <!-- Bouton pour basculer la config clavier -->
           <div class="keyboard-config">
             <button @click="toggleKeyboardConfig" class="btn btn-secondary">
               Config clavier : {{ keyboardConfig }}
@@ -68,65 +66,64 @@
           </div>
         </header>
 
-        <!-- Piano keys -->
+        <!-- Clavier virtuel -->
         <ul class="piano-keys">
           <li v-for="key in pianoKeys" :key="key.id" :class="['key', key.color]" @mousedown="keyDown(key)" @mouseup="keyUp(key)">
-            <span>{{ key.label }} <br /> {{ key.key }}</span>
+            <span>{{ key.label }}<br />{{ key.key }}</span>
           </li>
         </ul>
 
-        <!-- Silence and Rhythm modification -->
+        <!-- Boutons de modification du rythme -->
         <div class="d-flex gap-4">
-          <button class="m-5" data-key="r" id="silence-bt">
+          <button class="m-5" id="silence-bt">
             <span>
-              <img src="/src/assets/public/silences_pics/s1.png" height="40px" alt="Silence" />
+              <img src="/src/assets/public/silences_pics/s1.png" height="40" alt="Silence" />
               /
-              <img src="/src/assets/public/silences_pics/s4.png" height="40px" />
+              <img src="/src/assets/public/silences_pics/s4.png" height="40" alt="Silence" />
               /
-              <img src="/src/assets/public/silences_pics/s8.png" height="40px" />
+              <img src="/src/assets/public/silences_pics/s8.png" height="40" alt="Silence" />
               (b)
             </span>
           </button>
-
           <div class="rhythm-modif">
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('w')" data-key="w" id="whole-bt">
-              <img src="/src/assets/public/notes_pics/1.png" height="50px" alt="Whole" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('w')" id="whole-bt">
+              <img src="/src/assets/public/notes_pics/1.png" height="50" alt="Whole" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('hd')" data-key="hd" id="half-dotted-bt">
-              <img src="/src/assets/public/notes_pics/2d.png" height="50px" alt="Dotted half" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('hd')" id="half-dotted-bt">
+              <img src="/src/assets/public/notes_pics/2d.png" height="50" alt="Dotted half" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('h')" data-key="h" id="half-bt">
-              <img src="/src/assets/public/notes_pics/2.png" height="50px" alt="Half" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('h')" id="half-bt">
+              <img src="/src/assets/public/notes_pics/2.png" height="50" alt="Half" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('qd')" data-key="qd" id="quarter-dotted-bt">
-              <img src="/src/assets/public/notes_pics/4d.png" height="50px" alt="Dotted quarter" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('qd')" id="quarter-dotted-bt">
+              <img src="/src/assets/public/notes_pics/4d.png" height="50" alt="Dotted quarter" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('q')" data-key="q" id="quarter-bt">
-              <img src="/src/assets/public/notes_pics/4.png" height="50px" alt="Quarter" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('q')" id="quarter-bt">
+              <img src="/src/assets/public/notes_pics/4.png" height="50" alt="Quarter" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8d')" data-key="8d" id="8th-dotted-bt">
-              <img src="/src/assets/public/notes_pics/8d.png" height="50px" alt="Dotted 8-th" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8d')" id="8th-dotted-bt">
+              <img src="/src/assets/public/notes_pics/8d.png" height="50" alt="Dotted 8-th" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8')" id="8th-bt">
-              <img src="/src/assets/public/notes_pics/8.png" height="50px" alt="8-th" />
+              <img src="/src/assets/public/notes_pics/8.png" height="50" alt="8-th" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16d')" data-key="16d" id="16th-dotted-bt">
-              <img src="/src/assets/public/notes_pics/16d.png" height="50px" alt="Dotted 16-th" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16d')" id="16th-dotted-bt">
+              <img src="/src/assets/public/notes_pics/16d.png" height="50" alt="Dotted 16-th" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16')" data-key="16" id="16th-bt">
-              <img src="/src/assets/public/notes_pics/16.png" height="50px" alt="16-th" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16')" id="16th-bt">
+              <img src="/src/assets/public/notes_pics/16.png" height="50" alt="16-th" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32d')" data-key="32d" id="32th-dotted-bt">
-              <img src="/src/assets/public/notes_pics/32d.png" height="50px" alt="Dotted 32-th" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32d')" id="32th-dotted-bt">
+              <img src="/src/assets/public/notes_pics/32d.png" height="50" alt="Dotted 32-th" />
             </button>
-            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32')" data-key="32" id="32th-bt">
-              <img src="/src/assets/public/notes_pics/32.png" height="50px" alt="32-th" />
+            <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32')" id="32th-bt">
+              <img src="/src/assets/public/notes_pics/32.png" height="50" alt="32-th" />
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Collections options -->
+      <!-- Options avancées -->
       <div class="flex-column" style="display: flex; justify-content: space-between; gap: 20px;">
         <div class="collections-options">
           <label for="collections">Collection dans lesquelles rechercher :</label><br />
@@ -137,22 +134,19 @@
           </select>
         </div>
 
-        <!-- Search mode buttons -->
         <div class="flex-column" style="display: flex; gap: 20px;">
           <h4 class="text-center">Sélectionnez le type de recherche</h4>
           <div class="flex-row" style="display: flex; gap: 40px;">
             <button @click="searchExact" id="stricte" type="button" class="btn text-white tooltip-lb" style="background-color: #7ab6e0;">Recherche exacte</button>
-            <button @click="searchWithTolerance" id="modereeMelo" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance <br /> sur la hauteur des notes</button>
-            <button @click="searchWithRhythmTolerance" id="modereeRythm" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance <br /> sur le rythme</button>
+            <button @click="searchWithTolerance" id="modereeMelo" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance<br />sur la hauteur des notes</button>
+            <button @click="searchWithRhythmTolerance" id="modereeRythm" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance<br />sur le rythme</button>
           </div>
         </div>
 
-        <!-- Advanced options button -->
-        <button @click="toggleAdvancedOptions" id="toggleButton2" class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" data-button="options2">
+        <button @click="toggleAdvancedOptions" id="toggleButton2" class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
           Options avancées
         </button>
 
-        <!-- Advanced options -->
         <div style="min-height: 120px;">
           <div class="collapse collapse-vertical" id="collapseWidthExample">
             <div class="card card-body" style="width: 300px;">
@@ -173,20 +167,19 @@
               <div class="fuzzy-options">
                 <label class="tooltip-lb" id="pitch-dist-lb">
                   Tolérance de hauteur
-                  <input v-model="pitchTolerance" type="number" min="0" value="0" step="0.5" class="nb-select" />
+                  <input v-model="pitchTolerance" type="number" min="0" step="0.5" class="nb-select" />
                 </label><br />
                 <label class="tooltip-lb" id="duration-dist-lb">
                   Facteur de durée
-                  <input v-model="durationFactor" type="number" min="1" value="1" step="0.125" class="nb-select-large" />
+                  <input v-model="durationFactor" type="number" min="1" step="0.125" class="nb-select-large" />
                 </label><br />
                 <label class="tooltip-lb" id="sequencing-dist-lb">
                   Écart de durée
-                  <input v-model="durationGap" type="number" min="0" value="0" step="0.125" class="nb-select-large" />
+                  <input v-model="durationGap" type="number" min="0" step="0.125" class="nb-select-large" />
                 </label><br />
                 <label class="tooltip-lb" id="alpha-lb">
                   Alpha
-                  <input v-model="alpha" type="number" min="0" max="100" value="0" step="5" class="nb-select" />
-                  %
+                  <input v-model="alpha" type="number" min="0" max="100" step="5" class="nb-select" /> %
                 </label>
                 <hr />
                 <div class="clear_buttons">
@@ -198,7 +191,7 @@
         </div>
       </div>
 
-      <!-- Toast notifications -->
+      <!-- Notifications Toast -->
       <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div v-if="toastVisible" class="toast align-items-center text-bg-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
           <div class="toast-header text-white" style="background-color: #006485;">
@@ -210,19 +203,25 @@
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- Tooltip (hidden by default) -->
-    <div id="tooltip" class="info-note" style="display: none;"></div>
+    <!-- Résultats de la recherche : affichage des partitions SVG -->
+    <div v-if="searchResults.length > 0" class="search-results">
+      <h2>Partitions trouvées</h2>
+      <div v-for="(result, index) in searchResults" :key="index" class="result-partition" :id="'partition-' + index"></div>
+    </div>
 
+    <!-- (Optionnel) Tooltip caché -->
+    <div id="tooltip" class="info-note" style="display: none;"></div>
   </div>
 </template>
 
 <script>
-import * as VF from 'vexflow';
-const { Renderer, Stave, StaveNote, Formatter, Accidental, Dot } = VF;
-import { playNote, stopNote } from '../utils/audioUtils';
+import axios from "axios";
+import Collapse from "bootstrap/js/dist/collapse";
+import * as VF from "vexflow";
+const { Renderer, Stave, StaveNote, Formatter, Accidental } = VF;
+import { playNote, stopNote } from "../utils/audioUtils";
 
 export default {
   data() {
@@ -233,33 +232,34 @@ export default {
       pressedTimestamp: null,
       showHelpToast: true,
       showMicroToast: false,
-      selectedCollection: '',
-      collections: ['Collection 1', 'Collection 2'],
+      selectedCollection: "",
+      collections: [],
+      searchResults: [],
       pianoKeys: [
-        { id: 'C4', label: 'DO(C)', color: 'white', key: 'q' },
-        { id: 'C#4', label: 'DO#(c#)', color: 'black', key: 'z' },
-        { id: 'D4', label: 'RE(D)', color: 'white', key: 's' },
-        { id: 'D#4', label: 'RE#(D#)', color: 'black', key: 'e' },
-        { id: 'E4', label: 'MI(E)', color: 'white', key: 'd' },
-        { id: 'F4', label: 'FA(F)', color: 'white', key: 'f' },
-        { id: 'F#4', label: 'FA#(F#)', color: 'black', key: 't' },
-        { id: 'G4', label: 'SOL(G)', color: 'white', key: 'g' },
-        { id: 'G#4', label: 'SOL#(G#)', color: 'black', key: 'y' },
-        { id: 'A4', label: 'LA(A)', color: 'white', key: 'h' },
-        { id: 'A#4', label: 'LA#(A#)', color: 'black', key: 'u' },
-        { id: 'B4', label: 'SI(B)', color: 'white', key: 'j' },
-        { id: 'C5', label: 'DO(C)', color: 'white', key: 'k' },
-        { id: 'C#5', label: 'DO#(C#)', color: 'black', key: 'o' },
-        { id: 'D5', label: 'RE(D)', color: 'white', key: 'l' },
-        { id: 'D#5', label: 'RE#(D#)', color: 'black', key: 'p' },
-        { id: 'E5', label: 'MI(E)', color: 'white', key: 'm' },
-        { id: 'F5', label: 'FA(F)', color: 'white', key: 'ù' },
-        { id: 'F#5', label: 'FA#(F#)', color: 'black', key: ')' },
-        { id: 'G5', label: 'SOL(G)', color: 'white', key: '*' },
-        { id: 'G#5', label: 'SOL#(G#)', color: 'black', key: '$' },
-        { id: 'A5', label: 'LA(A)', color: 'white', key: '_' },
-        { id: 'A#5', label: 'LA#(A#)', color: 'black', key: '_' },
-        { id: 'B5', label: 'SI(B)', color: 'white', key: '_' }
+        { id: "C4", label: "DO(C)", color: "white", key: "q" },
+        { id: "C#4", label: "DO#(c#)", color: "black", key: "z" },
+        { id: "D4", label: "RE(D)", color: "white", key: "s" },
+        { id: "D#4", label: "RE#(D#)", color: "black", key: "e" },
+        { id: "E4", label: "MI(E)", color: "white", key: "d" },
+        { id: "F4", label: "FA(F)", color: "white", key: "f" },
+        { id: "F#4", label: "FA#(F#)", color: "black", key: "t" },
+        { id: "G4", label: "SOL(G)", color: "white", key: "g" },
+        { id: "G#4", label: "SOL#(G#)", color: "black", key: "y" },
+        { id: "A4", label: "LA(A)", color: "white", key: "h" },
+        { id: "A#4", label: "LA#(A#)", color: "black", key: "u" },
+        { id: "B4", label: "SI(B)", color: "white", key: "j" },
+        { id: "C5", label: "DO(C)", color: "white", key: "k" },
+        { id: "C#5", label: "DO#(C#)", color: "black", key: "o" },
+        { id: "D5", label: "RE(D)", color: "white", key: "l" },
+        { id: "D#5", label: "RE#(D#)", color: "black", key: "p" },
+        { id: "E5", label: "MI(E)", color: "white", key: "m" },
+        { id: "F5", label: "FA(F)", color: "white", key: "ù" },
+        { id: "F#5", label: "FA#(F#)", color: "black", key: ")" },
+        { id: "G5", label: "SOL(G)", color: "white", key: "*" },
+        { id: "G#5", label: "SOL#(G#)", color: "black", key: "$" },
+        { id: "A5", label: "LA(A)", color: "white", key: "_" },
+        { id: "A#5", label: "LA#(A#)", color: "black", key: "_" },
+        { id: "B5", label: "SI(B)", color: "white", key: "_" }
       ],
       pitchChecked: true,
       rhythmChecked: true,
@@ -269,113 +269,114 @@ export default {
       durationGap: 0,
       alpha: 0,
       toastVisible: false,
-      toastTitle: '',
-      toastMessage: '',
-      // Configuration clavier
-      keyboardConfig: 'azerty',
+      toastTitle: "",
+      toastMessage: "",
+      keyboardConfig: "azerty",
       azertyMapping: {
-        'q': 'C4',
-        'z': 'C#4',
-        's': 'D4',
-        'e': 'D#4',
-        'd': 'E4',
-        'f': 'F4',
-        't': 'F#4',
-        'g': 'G4',
-        'y': 'G#4',
-        'h': 'A4',
-        'u': 'A#4',
-        'j': 'B4',
-        'k': 'C5',
-        'o': 'C#5',
-        'l': 'D5',
-        'p': 'D#5',
-        'm': 'E5',
-        'ù': 'F5',
-        ')': 'F#5',
-        '*': 'G5',
-
+        q: "C4",
+        z: "C#4",
+        s: "D4",
+        e: "D#4",
+        d: "E4",
+        f: "F4",
+        t: "F#4",
+        g: "G4",
+        y: "G#4",
+        h: "A4",
+        u: "A#4",
+        j: "B4",
+        k: "C5",
+        o: "C#5",
+        l: "D5",
+        p: "D#5",
+        m: "E5",
+        "ù": "F5",
+        ")": "F#5",
+        "*": "G5"
       },
       qwertyMapping: {
-        'a': 'C4',
-        'w': 'C#4',
-        's': 'D4',
-        'e': 'D#4',
-        'd': 'E4',
-        'f': 'F4',
-        't': 'F#4',
-        'g': 'G4',
-        'y': 'G#4',
-        'h': 'A4',
-        'u': 'A#4',
-        'j': 'B4',
-        'k': 'C5'
+        a: "C4",
+        w: "C#4",
+        s: "D4",
+        e: "D#4",
+        d: "E4",
+        f: "F4",
+        t: "F#4",
+        g: "G4",
+        y: "G#4",
+        h: "A4",
+        u: "A#4",
+        j: "B4",
+        k: "C5"
       },
-      // Pour limiter les accords (nombre de sons simultanés)
-      currentlyPlayingNotes: []
+      currentlyPlayingNotes: [],
+      advancedOptionsVisible: false
     };
   },
   computed: {
     currentMapping() {
-      return this.keyboardConfig === 'azerty' ? this.azertyMapping : this.qwertyMapping;
+      return this.keyboardConfig === "azerty" ? this.azertyMapping : this.qwertyMapping;
     }
   },
   mounted() {
     this.initVexFlow();
-    document.addEventListener('keydown', this.handleGlobalKeyDown);
-    document.addEventListener('keyup', this.handleGlobalKeyUp);
+    this.fetchCollections();
+    document.addEventListener("keydown", this.handleGlobalKeyDown);
+    document.addEventListener("keyup", this.handleGlobalKeyUp);
   },
   beforeUnmount() {
-    document.removeEventListener('keydown', this.handleGlobalKeyDown);
-    document.removeEventListener('keyup', this.handleGlobalKeyUp);
+    document.removeEventListener("keydown", this.handleGlobalKeyDown);
+    document.removeEventListener("keyup", this.handleGlobalKeyUp);
   },
   methods: {
-    // INITIALISATION DE VEXFLOW
+    // Récupère la liste des collections depuis le backend
+    async fetchCollections() {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/collections", {
+          headers: { Accept: "application/json" }
+        });
+        this.collections = response.data.authors;
+      } catch (error) {
+        console.error("Erreur de chargement des collections:", error);
+      }
+    },
     initVexFlow() {
-      const div = document.getElementById('music-score');
+      const div = document.getElementById("music-score");
       if (!div) {
         console.error("L'élément 'music-score' est introuvable");
         return;
       }
       this.renderer = new Renderer(div, Renderer.Backends.SVG);
-      const width = 500, height = 200;
+      const width = 500,
+        height = 200;
       this.renderer.resize(width, height);
       this.context = this.renderer.getContext();
       this.stave = new Stave(10, 40, width - 20);
-      this.stave.addClef('treble').setContext(this.context).draw();
+      this.stave.addClef("treble").setContext(this.context).draw();
     },
-    // MISE À JOUR DE LA PORTÉE
     updateStaff() {
-      const svg = document.querySelector('#music-score svg');
+      const svg = document.querySelector("#music-score svg");
       if (svg) {
-        svg.innerHTML = '';
+        svg.innerHTML = "";
       }
       this.stave.setContext(this.context).draw();
       if (this.melody.length > 0) {
         Formatter.FormatAndDraw(this.context, this.stave, this.melody);
       }
     },
-    // AJOUTE UNE NOTE À LA MÉLODIE
-    addNote(noteStr, duration = 'q') {
+    addNote(noteStr, duration = "q") {
       let key = noteStr.replace(/([A-G])(#?)(\d)/, (match, p1, p2, p3) => {
-        return p1.toLowerCase() + (p2 ? '#' : '') + '/' + p3;
+        return p1.toLowerCase() + (p2 ? "#" : "") + "/" + p3;
       });
-      const note = new StaveNote({
-        keys: [key],
-        duration: duration
-      });
-      if (noteStr.includes('#')) {
+      const note = new StaveNote({ keys: [key], duration: duration });
+      if (noteStr.includes("#")) {
         note.addModifier(new Accidental("#"), 0);
       }
       this.melody.push(note);
       this.updateStaff();
     },
-    // GESTION DES TOUCHES DU PIANO (souris)
     keyDown(key) {
-      console.log(`Appuyer sur la touche: ${key.id}`);
-      // Bloquer si 2 sons sont déjà joués simultanément
       if (this.currentlyPlayingNotes.length > 1) {
-        this.playNote = !this.playNote;
         console.log("Accord bloqué : trop de notes simultanées.");
         return;
       }
@@ -384,31 +385,20 @@ export default {
       this.currentlyPlayingNotes.push(key.id);
     },
     keyUp(key) {
-      console.log(`Relâcher la touche: ${key.id}`);
       const elapsed = Date.now() - this.pressedTimestamp;
       this.pressedTimestamp = null;
-      let duration = 'q';
-      if (elapsed < 150) {
-        duration = '32';
-      } else if (elapsed < 300) {
-        duration = '16';
-      } else if (elapsed < 600) {
-        duration = '8';
-      } else if (elapsed < 900) {
-        duration = 'q';
-      } else if (elapsed < 1200) {
-        duration = 'h';
-      } else {
-        duration = 'w';
-      }
+      let duration = "q";
+      if (elapsed < 150) duration = "32";
+      else if (elapsed < 300) duration = "16";
+      else if (elapsed < 600) duration = "8";
+      else if (elapsed < 900) duration = "q";
+      else if (elapsed < 1200) duration = "h";
+      else duration = "w";
       stopNote(key.id);
       const index = this.currentlyPlayingNotes.indexOf(key.id);
-      if (index > -1) {
-        this.currentlyPlayingNotes.splice(index, 1);
-      }
+      if (index > -1) this.currentlyPlayingNotes.splice(index, 1);
       this.addNote(key.id, duration);
     },
-    // MODIFICATION DE LA DERNIÈRE NOTE
     changeLastNoteRhythm(newDuration) {
       if (this.melody.length === 0) {
         console.warn("Aucune note à modifier.");
@@ -416,29 +406,18 @@ export default {
       }
       const lastNote = this.melody.pop();
       const keys = lastNote.getKeys();
-      const isRest = lastNote.noteType === 'r';
       let newNote;
-      if (isRest) {
-        newNote = new StaveNote({
-          keys: ['b/4'],
-          duration: newDuration,
-          type: 'r'
-        });
+      if (lastNote.noteType === "r") {
+        newNote = new StaveNote({ keys: ["b/4"], duration: newDuration, type: "r" });
       } else {
-        newNote = new StaveNote({
-          keys: keys,
-          duration: newDuration,
-          clef: 'treble',
-          auto_stem: true
-        });
-        if (keys[0].includes('#')) {
+        newNote = new StaveNote({ keys: keys, duration: newDuration, clef: "treble", auto_stem: true });
+        if (keys[0].includes("#")) {
           newNote.addModifier(new Accidental("#"), 0);
         }
       }
       this.melody.push(newNote);
       this.updateStaff();
     },
-    // MÉTHODES EXISTANTES
     clearAll() {
       this.melody = [];
       this.updateStaff();
@@ -448,8 +427,8 @@ export default {
       this.updateStaff();
     },
     playMelody() {
-      console.log('Jouer la mélodie');
-      // Ajoutez ici la logique pour lire les sons des notes de la mélodie
+      console.log("Jouer la mélodie");
+      // Ajoutez ici la logique pour jouer la mélodie
     },
     changeOctave(diff) {
       this.octave += diff;
@@ -458,79 +437,128 @@ export default {
     },
     searchExact() {
       this.toastVisible = true;
-      this.toastTitle = 'Recherche exacte';
-      this.toastMessage = 'Vous effectuez une recherche exacte !';
-      setTimeout(() => {
-        this.toastVisible = false;
-      }, 3000);
+      this.toastTitle = "Recherche exacte";
+      this.toastMessage = "Vous effectuez une recherche exacte !";
+      setTimeout(() => (this.toastVisible = false), 3000);
     },
     searchWithTolerance() {
       this.toastVisible = true;
-      this.toastTitle = 'Recherche approchée';
-      this.toastMessage = 'Recherche tolérante sur la hauteur des notes.';
-      setTimeout(() => {
-        this.toastVisible = false;
-      }, 3000);
+      this.toastTitle = "Recherche approchée";
+      this.toastMessage = "Recherche tolérante sur la hauteur des notes.";
+      setTimeout(() => (this.toastVisible = false), 3000);
     },
     searchWithRhythmTolerance() {
       this.toastVisible = true;
-      this.toastTitle = 'Recherche approximative';
-      this.toastMessage = 'Recherche tolérante sur le rythme des notes.';
-      setTimeout(() => {
-        this.toastVisible = false;
-      }, 3000);
+      this.toastTitle = "Recherche approximative";
+      this.toastMessage = "Recherche tolérante sur le rythme des notes.";
+      setTimeout(() => (this.toastVisible = false), 3000);
     },
     toggleAdvancedOptions() {
-      console.log("Basculer les options avancées");
-    },
-    closeToast(toastType) {
-      if (toastType === 'help') {
-        this.showHelpToast = false;
-      } else if (toastType === 'micro') {
-        this.showMicroToast = false;
+      this.advancedOptionsVisible = !this.advancedOptionsVisible;
+      const collapseElement = document.getElementById("collapseWidthExample");
+      if (!collapseElement) {
+        console.error("L'élément 'collapseWidthExample' n'a pas été trouvé.");
+        return;
       }
+      const bsCollapse = Collapse.getInstance(collapseElement) || new Collapse(collapseElement, { toggle: false });
+      this.advancedOptionsVisible ? bsCollapse.show() : bsCollapse.hide();
     },
     searchWithAdvancedOptions() {
-      console.log('Recherche avec options avancées');
-      // Logique de recherche avancée
+      if (this.melody.length < 3) {
+        console.error("La mélodie doit contenir au moins 3 notes pour lancer la recherche.");
+        return;
+      }
+      const noteConditionsArray = this.melody.slice(0, 3).map((note) => {
+        const key = note.getKeys()[0]; // par ex. "c/4"
+        const [noteLetter, octave] = key.split("/");
+        const noteClass = noteLetter.replace("#", "");
+        let durValue = 8;
+        if (note.duration === "16") durValue = 16;
+        else if (note.duration === "32") durValue = 32;
+        else if (note.duration === "w") durValue = 1;
+        return { class: noteClass, octave: parseInt(octave, 10), duration: durValue };
+      });
+      const query = `
+        MATCH (tp:TopRhythmic)-[:RHYTHMIC]->(m:Measure),
+              (e0:Event)-[n0:NEXT]->(e1:Event)-[n1:NEXT]->(e2:Event),
+              (e0)--(f0:Fact), (e1)--(f1:Fact), (e2)--(f2:Fact)
+        WHERE tp.collection = '${this.selectedCollection}'
+          AND f0.class = '${noteConditionsArray[0].class}' AND f0.octave = ${noteConditionsArray[0].octave} AND f0.dur = ${noteConditionsArray[0].duration}
+          AND f1.class = '${noteConditionsArray[1].class}' AND f1.octave = ${noteConditionsArray[1].octave} AND f1.dur = ${noteConditionsArray[1].duration}
+          AND f2.class = '${noteConditionsArray[2].class}' AND f2.octave = ${noteConditionsArray[2].octave} AND f2.dur = ${noteConditionsArray[2].duration}
+        RETURN DISTINCT e0.source AS source, e0.start AS start
+        LIMIT 10
+      `.trim();
+      console.log("Envoi de la requête:\n", query);
+      axios
+        .get("http://127.0.0.1:5000/search", {
+          params: { query: query, fuzzy: true }
+        })
+        .then((response) => {
+          console.log("Résultats de la recherche :", response.data);
+          this.searchResults = response.data.results;
+          this.$nextTick(() => {
+            this.searchResults.forEach((result, index) => {
+              this.renderPartition(index, result.source);
+            });
+          });
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la recherche :", error);
+        });
     },
-    // GESTION DES TOUCHES DU CLAVIER (globale)
+
+    renderPartition(index, svgUrl) {
+      axios
+        .get(svgUrl)
+        .then((response) => {
+          let svgContent = response.data;
+          svgContent = this.applyGradient(svgContent);
+          const container = document.getElementById("partition-" + index);
+          if (container) {
+            container.innerHTML = svgContent;
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur lors du chargement du SVG :", error);
+        });
+    },
+    applyGradient(svgContent) {
+      // Exemple d'ajout d'un gradient linéaire.
+      const gradientDef = `
+        <defs>
+          <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#ff0000;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0000ff;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+      `;
+      // Insère la définition du gradient juste après la balise <svg ...>
+      return svgContent.replace(/(<svg[^>]*>)/, `$1${gradientDef}`);
+    },
+    closeToast(toastType) {
+      if (toastType === "help") this.showHelpToast = false;
+      else if (toastType === "micro") this.showMicroToast = false;
+    },
     handleGlobalKeyDown(event) {
       const tag = event.target.tagName.toLowerCase();
-      if (tag === 'input' || tag === 'textarea') return;
-      const mapping = this.currentMapping;
-      const note = mapping[event.key];
-      if (note && !event.repeat) {
-        this.keyDown({ id: note });
-      }
+      if (tag === "input" || tag === "textarea") return;
+      const note = this.currentMapping[event.key];
+      if (note && !event.repeat) this.keyDown({ id: note });
     },
     handleGlobalKeyUp(event) {
       const tag = event.target.tagName.toLowerCase();
-      if (tag === 'input' || tag === 'textarea') return;
-      const mapping = this.currentMapping;
-      const note = mapping[event.key];
-      if (note) {
-        this.keyUp({ id: note });
-      }
+      if (tag === "input" || tag === "textarea") return;
+      const note = this.currentMapping[event.key];
+      if (note) this.keyUp({ id: note });
     },
-    // Permet de basculer entre AZERTY et QWERTY
     toggleKeyboardConfig() {
-      this.keyboardConfig = this.keyboardConfig === 'azerty' ? 'qwerty' : 'azerty';
-      console.log("Configuration du clavier : " + this.keyboardConfig);
+      this.keyboardConfig = this.keyboardConfig === "azerty" ? "qwerty" : "azerty";
+      console.log("Configuration du clavier :", this.keyboardConfig);
     }
-  },
-  computed: {
-    currentMapping() {
-      return this.keyboardConfig === 'azerty' ? this.azertyMapping : this.qwertyMapping;
-    }
-  },
-  beforeUnmount() {
-    document.removeEventListener('keydown', this.handleGlobalKeyDown);
-    document.removeEventListener('keyup', this.handleGlobalKeyUp);
   }
 };
 </script>
-
 
 <style scoped>
 .clear_buttons {
@@ -568,5 +596,15 @@ export default {
 }
 .keyboard-config {
   margin-left: 20px;
+}
+.searchbar-box {
+  background-color: white;
+  color: black;
+  border-bottom: 0.5px solid aqua;
+}
+.result-partition {
+  margin: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
 }
 </style>

@@ -1,33 +1,34 @@
 <template>
-  <div class="collections-container">
+  <div class="container-main">
     <div class="searchbar-box">
-      <h1 class="searchbar-title p-2 text-center">Les collections</h1>
+        <h1 class="searchbar-title p-2 text-center">Les collections</h1>
     </div>
-
-    <div class="father_container d-flex flex-row gap-1">
-      <!-- MENU LEFT -->
-      <div id="menuCollection" class="card-lg shadow bg-body-tertiary gap-5 position-fixed rounded-end"
-           style="width: 18rem; top: 30px; left: 0; height: 60vh; z-index: 1;">
-        <div class="card-header text-center fs-1 d-flex flex-column">
-          <i class="bi bi-people-fill fs-1" style="color: #006485;"></i>
-          Collections
+    <div class="collections-container">
+      <div class="father_container d-flex flex-row gap-1">
+        <!-- MENU LEFT -->
+        <div id="menuCollection" class="card-lg shadow bg-body-tertiary gap-5 position-fixed rounded-end"
+            style="width: 18rem; top: 30px; left: 0; height: 60vh; z-index: 1;">
+          <div class="card-header text-center fs-1 d-flex flex-column">
+            <i class="bi bi-people-fill fs-1" style="color: #006485;"></i>
+            Collections
+          </div>
+          <hr />
+          <br />
+          <div class="list-group gap-5">
+            <button v-for="(author, index) in authors" :key="index"
+                    class="btn list-group-item-action w-75 mx-auto d-flex align-items-center"
+                    :class="{ 'active': author === selectedAuthor }"
+                    @click="fetchPageData(author)">
+              {{ author }}
+            </button>
+          </div>
         </div>
-        <hr />
-        <br />
-        <div class="list-group gap-5">
-          <button v-for="(author, index) in authors" :key="index"
-                  class="btn list-group-item-action w-75 mx-auto d-flex align-items-center"
-                  :class="{ 'active': author === selectedAuthor }"
-                  @click="fetchPageData(author)">
-            {{ author }}
-          </button>
-        </div>
-      </div>
 
-      <!-- PARTITIONS VIEW -->
-      <div class="archives" style="margin-left: 18rem;">
-        <p id="archives" class="text-secondary m-4">{{ archivesText }}</p>
-        <PaginatedResults :scores="scores" />
+        <!-- PARTITIONS VIEW -->
+        <div class="archives" style="margin-left: 18rem;">
+          <p id="archives" class="text-secondary m-4">{{ archivesText }}</p>
+          <PaginatedResults :scores="scores" />
+        </div>
       </div>
     </div>
   </div>
@@ -99,6 +100,12 @@ onMounted(async () => {
 
 #menuCollection{
   margin-top: 8%;
+}
+
+.searchbar-box {
+  background-color: white;
+  color: black;
+  border-bottom: 0.5px solid aqua;
 }
 
 </style>

@@ -6,6 +6,7 @@ import HeaderComponent from './components/HeaderComponent.vue';
 import FooterComponent from './components/FooterComponent.vue';
 import '/src/utils/audioUtils.js';
 import '/src/assets/styles/semantic.min.css';
+import '/src/assets/styles/paginated_results.css';
 import '/src/assets/styles/search_interface_style.css';
 import '/src/assets/scripts/paginated_results.js';
 import '/src/assets/scripts/preview_scores.js';

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import driver  # Vérifie que le driver est bien importé
+from ..database import driver  # Vérifie que le driver est bien importé
 
 neo4j_routes = Blueprint("neo4j", __name__)  # 🔥 Définit bien le Blueprint AVANT les routes
 

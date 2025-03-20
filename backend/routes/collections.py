@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
-from database import driver  # ✅ Connexion à Neo4j
+from ..database import driver  # ✅ Connexion à Neo4j
 import os
 
 collections_routes = Blueprint("collections", __name__)  # ✅ Nom correct du Blueprint
 
-DATA_PATH = os.path.join(os.getcwd(), "data")  # 📂 `/backend/data/`
+#DATA_PATH = os.path.join(os.getcwd(), "data")  # 📂 `/backend/data/`
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
 
 @collections_routes.route("/", methods=["GET"])
 def get_collections():

@@ -35,7 +35,8 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .searchbar-box {
-    background-color: #006485;
+    width: 100% !important;
+    background-color: white;
     height: 7.5vh;
     min-height: 50px;
     max-height: 100px;
@@ -102,7 +103,7 @@ label {
 
 /* Section principale HOME*/
 .hero {
-    background: #006485;
+    background: white;
     color: white;
     padding: 4rem 0;
     text-align: center;

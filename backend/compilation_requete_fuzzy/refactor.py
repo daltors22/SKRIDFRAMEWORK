@@ -1,7 +1,7 @@
 import re
 import csv
 from io import StringIO
-from extract_notes_from_query import extract_fuzzy_membership_functions, extract_fuzzy_parameters
+from .extract_notes_from_query import extract_fuzzy_membership_functions, extract_fuzzy_parameters
 
 def move_attribute_values_to_where_clause(query):
     '''

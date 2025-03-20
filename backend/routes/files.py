@@ -3,12 +3,16 @@ import os
 
 files_routes = Blueprint("files", __name__)
 
+# Définir DATA_FOLDER de manière relative au fichier actuel :
+DATA_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data")
+
 # 📂 Servir les fichiers statiques depuis `/backend/data/`
 @files_routes.route("/data/<author>/<subfolder>/<filename>", methods=["GET"])
 def serve_file(author, subfolder, filename):
-    
-    """ 📌 Servir un fichier SVG ou MEI depuis /backend/data/author/svg/ """
-    data_folder = os.path.join(os.getcwd(), "data", author, subfolder)
+    """
+    📌 Servir un fichier SVG ou MEI depuis /backend/data/author/subfolder/ (par exemple, svg ou mei)
+    """
+    data_folder = os.path.join(DATA_FOLDER, author, subfolder)
     file_path = os.path.join(data_folder, filename)
 
     print(f"🔍 Requête pour {file_path}")

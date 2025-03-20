@@ -1,4 +1,5 @@
 <template>
+  <div class="container-main">
     <div class="searchbar-box text-center animate__animated animate__fadeInLeft">
         <h1 class="searchbar-title">Références</h1>
     </div>
@@ -39,7 +40,8 @@
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
   export default {
@@ -71,5 +73,10 @@
   
   .list-unstyled a:hover {
     text-decoration: underline;
+  }
+  .searchbar-box {
+  background-color: white;
+  color: black;
+  border-bottom: 0.5px solid aqua;
   }
   </style>

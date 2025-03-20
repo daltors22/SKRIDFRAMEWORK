@@ -1,8 +1,8 @@
-from neo4j_connection import connect_to_neo4j, run_query
-from generate_audio import generate_mp3
-from degree_computation import convert_note_to_sharp
-from note import Note
-from refactor import move_attribute_values_to_where_clause
+from .neo4j_connection import connect_to_neo4j, run_query
+from .generate_audio import generate_mp3
+from .degree_computation import convert_note_to_sharp
+from .note import Note
+from .refactor import move_attribute_values_to_where_clause
 
 
 def create_query_from_list_of_notes(notes, pitch_distance, duration_factor, duration_gap, alpha, allow_transposition, contour_match, collection=None):

@@ -2,12 +2,12 @@ from flask import Flask
 from flask_cors import CORS
 from flask import Flask, jsonify
 
-from database import close_db
-from routes.search import search_routes
-from routes.collections import collections_routes
-from routes.neo4j_queries import neo4j_routes
-from routes.scripts import script_routes
-from routes.files import files_routes
+from .database import close_db
+from .routes.search import search_routes
+from .routes.collections import collections_routes
+from .routes.neo4j_queries import neo4j_routes
+from .routes.scripts import script_routes
+from .routes.files import files_routes
 from flask import request
 
 # ============================= Init Flask =============================#

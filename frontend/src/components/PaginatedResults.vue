@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineProps } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter } from 'vue-router';
 
 const props = defineProps(["scores"]);
@@ -131,9 +131,9 @@ const formatTitle = (filename) => {
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* ✅ Toujours 3 colonnes */
+  grid-template-columns: repeat(4, 1fr); /* ✅ Toujours 3 colonnes */
   gap: 20px;
-  width: 1100px;
+  width: auto;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
@@ -199,5 +199,12 @@ const formatTitle = (filename) => {
 .pagination-select {
   padding: 5px;
   margin-left: 10px;
+}
+@media screen and (max-width: 500px) {
+
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr) !important; /* ✅ Toujours 3 colonnes */
+  
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
-    <div v-if="showSearchbar" :class="['searchbar-box', { 'fade-out': fadingOut }]" class="searchbar-box text-center" @animationend="hideSearchbar">
+  <div class="container-main">
+    <div class="searchbar-box text-center">
         <h1 class="searchbar-title">Comment ça marche ?</h1>
     </div>
     <div class="container mt-5">
@@ -49,25 +50,18 @@
         <br>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
   export default {
     name: 'PlusView',
     data() {
     return {
-      showSearchbar: true,
-      fadingOut: false
+      
     };
     },
-    mounted() {
-        setTimeout(() => {
-        this.fadingOut = true;
-        setTimeout(() => {
-            this.showSearchbar = false;
-        }, 1500); // Durée de la transition avant suppression
-        }, 3000); // Temps d'affichage avant disparition
-    }
+    
   };
   </script>
   
@@ -107,8 +101,9 @@
     transition: opacity 1.5s ease-in-out;
     opacity: 1;
   }
-
-  .fade-out {
-    opacity: 0;
+  .searchbar-box {
+  background-color: white;
+  color: black;
+  border-bottom: 0.5px solid aqua;
   }
   </style>

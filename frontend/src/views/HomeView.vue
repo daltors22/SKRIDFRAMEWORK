@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div class="container-main">
       <!-- Section principale -->
       <div class="searchbar-box text-center animate__animated animate__fadeInDown">
         <div class="container mb-5">
           <br>
-          <h1>SKRID</h1>
+          <h1 class="text-white">SKRID</h1>
           <p></p>
           <a href="#services" class="btn btn-outline btn-lg mt-3" style="background-color: #7ab6e0;">En savoir plus</a>
         </div>
@@ -113,7 +113,7 @@
   
   <style scoped>
   .hero {
-    background: #006485;
+    background: white;
     color: white;
     padding: 4rem 0;
     text-align: center;
@@ -131,5 +131,11 @@
   
   p {
     font-size: 14px;
+  }
+  .searchbar-box {
+    margin-top: 70px;
+    background: linear-gradient(to right, rgba(0, 100, 133, 1), rgba(0, 120, 160, 0.9), rgba(0, 100, 155, 0.8), rgba(0, 100, 133, 0.7));
+    color: black;
+    
   }
   </style>
