@@ -11,6 +11,8 @@ import '/src/assets/styles/search_interface_style.css';
 import '/src/assets/scripts/paginated_results.js';
 import '/src/assets/scripts/preview_scores.js';
 import '/src/assets/scripts/vexflow-core.js';
+import '/src/assets/scripts/verovio-toolkit.js';
+
 
 
 const app = createApp(App);

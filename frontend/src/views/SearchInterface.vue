@@ -336,47 +336,48 @@ export default {
       }
     },
     // Charge et rend une partition MEI dans un conteneur donné
-    renderMEI(result, elementId) {
-      if (!this.vtk) return;
-      // Construction de l'URL pour charger le fichier MEI
-      // Supposons que vos fichiers MEI se trouvent dans /files/data/{selectedCollection}/mei/
-      const url = `/files/data/${this.selectedCollection}/mei/${result.source}`;
-      axios
-        .get(url)
-        .then(response => {
-          const meiData = response.data;
-          // Options de rendu (ajustez selon vos besoins)
-          this.vtk.setOptions({ scale: 1.0 });
-          this.vtk.loadData(meiData);
-          const svg = this.vtk.renderToSVG(1, {});
-          // Insérer le SVG dans le conteneur
-          document.getElementById(elementId).innerHTML = svg;
-          // Appliquer la fonction de gradient aux éléments du SVG
-          this.applyGradient(elementId);
-        })
-        .catch(error => {
-          console.error("Erreur en chargeant le fichier MEI", error);
-        });
-    },
-    // Stub pour appliquer un gradient aux notes dans le SVG
+    renderSVG(result, elementId) {
+    let selectedAuthor = this.selectedCollection.replace(/\s+/g, "-");
+    let svgFilename = result.source.replace(/\.mei$/i, ".svg");
+    const url = `http://127.0.0.1:5000/files/data/${selectedAuthor}/svg/${svgFilename}`;
+    
+    axios
+      .get(url, { responseType: 'text' })
+      .then(response => {
+        document.getElementById(elementId).innerHTML = response.data;
+        this.applyGradient(elementId);
+      })
+      .catch(error => {
+        console.error("Erreur en chargeant le fichier SVG", error);
+      });
+  },
+
+
+
+
+
+
+
+
+    // Applique un gradient aux notes du SVG rendu
     applyGradient(elementId) {
       const svgContainer = document.getElementById(elementId);
       if (!svgContainer) return;
-      // Par exemple, vous pouvez rechercher les éléments de note (à adapter selon le rendu Verovio)
       const notes = svgContainer.querySelectorAll("[class*='note']");
-      // Appliquer un dégradé ou modifier les styles selon le nombre d'occurrences.
       notes.forEach(note => {
-        // Exemple simple : changer la couleur de remplissage
-        note.style.fill = "url(#monGradient)"; // Assurez-vous que le gradient existe dans le SVG
+        note.style.fill = "url(#monGradient)"; // Assurez-vous que le gradient est défini dans le SVG
       });
     },
-    // Méthode pour récupérer les collections
+    // Récupère les collections depuis le backend
     async fetchCollections() {
       try {
+        console.log('chargement collections...');
         const response = await axios.get("http://127.0.0.1:5000/collections", {
           headers: { Accept: "application/json" }
         });
         this.collections = response.data.authors;
+        console.log('collections trouvées:');
+        console.log(this.collections);
         if (this.collections.length > 0 && !this.selectedCollection) {
           this.selectedCollection = this.collections[0];
         }
@@ -417,7 +418,6 @@ export default {
     keyDown(key) {
       if (this.currentlyPlayingNotes.length > 1) return;
       this.pressedTimestamp = Date.now();
-      // Votre fonction playNote
       this.currentlyPlayingNotes.push(key.id);
     },
     keyUp(key) {
@@ -430,7 +430,6 @@ export default {
       else if (elapsed < 900) duration = "q";
       else if (elapsed < 1200) duration = "h";
       else duration = "w";
-      // Votre fonction stopNote
       const index = this.currentlyPlayingNotes.indexOf(key.id);
       if (index > -1) this.currentlyPlayingNotes.splice(index, 1);
       this.addNote(key.id, duration);
@@ -439,8 +438,7 @@ export default {
       if (this.melody.length === 0) return;
       const lastNote = this.melody.pop();
       const keys = lastNote.getKeys();
-      let newNote;
-      newNote = new StaveNote({ keys: keys, duration: newDuration, clef: "treble", auto_stem: true });
+      let newNote = new StaveNote({ keys: keys, duration: newDuration, clef: "treble", auto_stem: true });
       if (keys[0].includes("#")) newNote.addModifier(new Accidental("#"), 0);
       this.melody.push(newNote);
       this.updateStaff();
@@ -455,7 +453,7 @@ export default {
     },
     playMelody() {
       console.log("Jouer la mélodie");
-      // Implémenter la lecture si nécessaire
+      // Implémentez la lecture si nécessaire
     },
     changeOctave(diff) {
       this.octave += diff;
@@ -496,35 +494,33 @@ export default {
 
       // Extraction des conditions pour les 3 premières notes
       const noteConditionsArray = this.melody.slice(0, 3).map((note) => {
-        const key = note.getKeys()[0]; // Exemple : "c/4"
+        const key = note.getKeys()[0];
         const [noteLetter, octave] = key.split('/');
         const noteClass = noteLetter.replace('#', '');
-        let durValue = 8; // Valeur par défaut pour une noire (quarter note)
-        if (note.duration === '16') {
-          durValue = 16;
-        } else if (note.duration === '32') {
-          durValue = 32;
-        } else if (note.duration === 'w') {
-          durValue = 1;
-        }
+        let durValue = 8;
+        if (note.duration === '16') durValue = 16;
+        else if (note.duration === '32') durValue = 32;
+        else if (note.duration === 'w') durValue = 1;
         return { class: noteClass, octave: parseInt(octave, 10), duration: durValue };
       });
 
-      // Construction de la requête avec WITH DISTINCT
+      // Construction de la requête
       const query = `
       MATCH (tp:TopRhythmic)-[:RHYTHMIC]->(m:Measure),
-      (e0:Event)-[:NEXT]->(e1:Event)-[:NEXT]->(e2:Event),
-      (e0)--(f0:Fact), (e1)--(f1:Fact), (e2)--(f2:Fact)
-WHERE tp.collection = 'Albert Poulain'
-  AND f0.class = 'g' AND f0.octave = 4 AND f0.dur = 8
-  AND f1.class = 'b' AND f1.octave = 4 AND f1.dur = 8
-  AND f2.class = 'd' AND f2.octave = 5 AND f2.dur = 8
-WITH e0, e0.source AS source, e0.start AS start, ID(e0) AS eventId
-RETURN eventId, head(collect({source: source, start: start})) AS result
-ORDER BY eventId
-
+            (m)-[:HAS]->(e0:Event),
+            (e0)--(f0:Fact),
+            (e0)-[:NEXT]->(e1:Event)--(f1:Fact),
+            (e1)-[:NEXT]->(e2:Event)--(f2:Fact)
+      WHERE tp.collection = '${this.selectedCollection}'
+        AND f0.class = 'g' AND f0.octave = 4 AND f0.dur = 8
+        AND f1.class = 'b' AND f1.octave = 4 AND f1.dur = 8
+        AND f2.class = 'd' AND f2.octave = 5 AND f2.dur = 8
+      RETURN DISTINCT e0.source AS source, e0.start AS start
       `.trim();
-
+      if (!this.selectedCollection || this.selectedCollection.trim() === "") {
+        alert("Veuillez sélectionner ou saisir une collection.");
+        return;
+      }
       console.log("Envoi de la requête:\n", query);
 
       axios.get("http://127.0.0.1:5000/search", {
@@ -533,15 +529,27 @@ ORDER BY eventId
       .then(response => {
         console.log("Résultats de la recherche :", response.data);
         this.searchResults = response.data.results;
-        // Ici, vous pouvez appeler votre fonction pour afficher la partition avec Verovio
-        // par exemple: this.renderWithVerovio(this.searchResults);
+        // Une fois les résultats insérés dans le DOM, rend chaque MEI en SVG via Verovio
+        this.$nextTick(() => {
+          this.searchResults.forEach((result, index) => {
+            this.renderSVG(result, 'result-svg-' + index);
+          });
+        });
       })
       .catch(error => {
         console.error("Erreur lors de la recherche :", error);
       });
     },
-
-
+    /**
+     * Construit l'URL du fichier SVG correspondant à la partition.
+     * On suppose que les fichiers SVG se trouvent dans :
+     *    /files/data/<selectedCollection>/svg/
+     * et que le nom de fichier MEI a l'extension .mei qu'on remplace par .svg
+     */
+    svgUrl(meiFilename) {
+      const svgFilename = meiFilename.replace(/\.mei$/i, ".svg");
+      return `/files/data/${this.selectedCollection}/svg/${svgFilename}`;
+    },
     closeToast(toastType) {
       if (toastType === "help") this.showHelpToast = false;
       else if (toastType === "micro") this.showMicroToast = false;
@@ -566,45 +574,39 @@ ORDER BY eventId
     },
     showKeyBinds() {
       console.log("click");
-      console.log(checkPics.value);
       console.log(this.checkPic);
       this.checkPic = false;
       if (this.checkPic === false) {
-        this.checkPic === true;
         const pianoKeysHide = [
-        { id: "C4", label: "", color: "white"},
-        { id: "C#4", label: "", color: "black"},
-        { id: "D4", label: "", color: "white"},
-        { id: "D#4", label: "", color: "black"},
-        { id: "E4", label: "", color: "white"},
-        { id: "F4", label: "", color: "white"},
-        { id: "F#4", label: "", color: "black"},
-        { id: "G4", label: "", color: "white"},
-        { id: "G#4", label: "", color: "black"},
-        { id: "A4", label: "", color: "white"},
-        { id: "A#4", label: "", color: "black"},
-        { id: "B4", label: "", color: "white"},
-        { id: "C5", label: "", color: "white"},
-        { id: "C#5", label: "", color: "black"},
-        { id: "D5", label: "", color: "white"},
-        { id: "D#5", label: "", color: "black"},
-        { id: "E5", label: "", color: "white"},
-        { id: "F5", label: "", color: "white"},
-        { id: "F#5", label: "", color: "black"},
-        { id: "G5", label: "", color: "white"},
-        { id: "G#5", label: "", color: "black"},
-        { id: "A5", label: "", color: "white"},
-        { id: "A#5", label: "", color: "black"},
-        { id: "B5", label: "", color: "white"}
-      ];
+          { id: "C4", label: "", color: "white"},
+          { id: "C#4", label: "", color: "black"},
+          { id: "D4", label: "", color: "white"},
+          { id: "D#4", label: "", color: "black"},
+          { id: "E4", label: "", color: "white"},
+          { id: "F4", label: "", color: "white"},
+          { id: "F#4", label: "", color: "black"},
+          { id: "G4", label: "", color: "white"},
+          { id: "G#4", label: "", color: "black"},
+          { id: "A4", label: "", color: "white"},
+          { id: "A#4", label: "", color: "black"},
+          { id: "B4", label: "", color: "white"},
+          { id: "C5", label: "", color: "white"},
+          { id: "C#5", label: "", color: "black"},
+          { id: "D5", label: "", color: "white"},
+          { id: "D#5", label: "", color: "black"},
+          { id: "E5", label: "", color: "white"},
+          { id: "F5", label: "", color: "white"},
+          { id: "F#5", label: "", color: "black"},
+          { id: "G5", label: "", color: "white"},
+          { id: "G#5", label: "", color: "black"},
+          { id: "A5", label: "", color: "white"},
+          { id: "A#5", label: "", color: "black"},
+          { id: "B5", label: "", color: "white"}
+        ];
         this.pianoKeys = pianoKeysHide;
-        console.log(this.pianoKeys.keys);
-        console.log(this.pianoKeys.label);
-        this.checkPics.value === off;
-      }
-      else {
-        this.checkPic === false;
-        this.pianoKeys === this.pianoKeys;
+      } else {
+        // Remettre les touches par défaut
+        // (le mapping initial est conservé dans this.pianoKeys)
       }
       console.log(this.checkPic);
     }

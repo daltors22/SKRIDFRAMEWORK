@@ -9,9 +9,6 @@ DATA_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "da
 # 📂 Servir les fichiers statiques depuis `/backend/data/`
 @files_routes.route("/data/<author>/<subfolder>/<filename>", methods=["GET"])
 def serve_file(author, subfolder, filename):
-    """
-    📌 Servir un fichier SVG ou MEI depuis /backend/data/author/subfolder/ (par exemple, svg ou mei)
-    """
     data_folder = os.path.join(DATA_FOLDER, author, subfolder)
     file_path = os.path.join(data_folder, filename)
 
@@ -22,4 +19,5 @@ def serve_file(author, subfolder, filename):
         return abort(404)
 
     print(f"✅ Fichier trouvé, envoi : {file_path}")
-    return send_from_directory(data_folder, filename)
+    return send_from_directory(data_folder, filename, as_attachment=False, mimetype="application/xml")
+
