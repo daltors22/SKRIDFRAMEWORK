@@ -177,6 +177,7 @@ const fetchMeiMetadata = async () => {
     flex-direction: column;
     align-items: center;
     padding: 20px;
+    margin-top: 50px;
   }
   
   .score-container {

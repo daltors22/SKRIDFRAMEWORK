@@ -65,6 +65,12 @@ Test - lancer le serveur Flask - port :5000
 python api.py
 ```
 
+ou -> cd ..
+
+```
+python3 -m backend.api
+```
+
 ### Installation du frontend
 Pré-requis : Node et npm
 

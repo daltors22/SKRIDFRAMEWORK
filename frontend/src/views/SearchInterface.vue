@@ -35,7 +35,10 @@
         <div id="music-score"></div>
         <div class="clear_buttons">
           <button @click="clearAll" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_all">Supprimer tout</button>
-          <button @click="removeLastNote" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_last_note">Supprimer la dernière note</button>
+          <button @click="removeLastNote" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_last_note">
+            Supprimer la dernière note
+          </button>
+
           <button @click="playMelody" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="play_melody">Jouer la mélodie</button>
         </div>
       </div>
@@ -321,6 +324,11 @@ export default {
     document.addEventListener("keydown", this.handleGlobalKeyDown);
     document.addEventListener("keyup", this.handleGlobalKeyUp);
     this.initVerovio();
+    window.addEventListener("keydown", this.handleKeydown);
+  },
+  beforeDestroy() {
+  // Retirer l'événement quand le composant est détruit pour éviter les fuites de mémoire
+  window.removeEventListener("keydown", this.handleKeydown);
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleGlobalKeyDown);
@@ -351,13 +359,6 @@ export default {
         console.error("Erreur en chargeant le fichier SVG", error);
       });
   },
-
-
-
-
-
-
-
 
     // Applique un gradient aux notes du SVG rendu
     applyGradient(elementId) {
@@ -447,9 +448,21 @@ export default {
       this.melody = [];
       this.updateStaff();
     },
+    handleKeydown(event) {
+    // Vérifier si la touche pressée est la touche "Delete" (keyCode 46 ou "Del")
+      if (event.key === "Delete" || event.key === "Backspace") {
+        this.removeLastNote();
+      }
+    },
+    
     removeLastNote() {
-      this.melody.pop();
-      this.updateStaff();
+      // Vérifie s'il y a des éléments dans le tableau avant de les supprimer
+      if (this.melody.length > 0) {
+        this.melody.pop(); // Retirer la dernière note
+        this.updateStaff(); // Appeler la fonction qui met à jour l'affichage de la portée
+      } else {
+        alert("Aucune note à supprimer");
+      }
     },
     playMelody() {
       console.log("Jouer la mélodie");
