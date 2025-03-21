@@ -11,10 +11,10 @@
 
     <!-- ✅ Pagination -->
     <div class="navigation">
-      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-bt">Page précédente</button>
+      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-bt" style="background-color: #006485;">Page précédente</button>
       <input type="number" min="1" :max="totalPages" v-model="currentPage" @change="loadPageData" class="page-nb-input">
       <label>/ {{ totalPages }}</label>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-bt">Page suivante</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-bt" style="background-color: #006485;">Page suivante</button>
     </div>
 
     <!-- ✅ Affichage des partitions en grille -->
@@ -36,10 +36,10 @@
 
     <!-- ✅ Pagination -->
     <div class="navigation">
-      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-bt">Page précédente</button>
+      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-bt" style="background-color: #006485;">Page précédente</button>
       <input type="number" min="1" :max="totalPages" v-model="currentPage" @change="loadPageData" class="page-nb-input">
       <label>/ {{ totalPages }}</label>
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-bt">Page suivante</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-bt" style="background-color: #006485;">Page suivante</button>
     </div>
   </div>
 </template>
@@ -206,5 +206,8 @@ const formatTitle = (filename) => {
     grid-template-columns: repeat(4, 1fr) !important; /* ✅ Toujours 3 colonnes */
   
   }
+}
+.pagination-bt:disabled {
+    background-color: rgb(155, 154, 154) !important;
 }
 </style>

@@ -1,10 +1,11 @@
 <template>
   <div>
-    <!-- Barre de recherche et notifications -->
+    <!-- Barre de recherche et options -->
     <div class="searchbar-box">
       <h1 class="searchbar-title">Rechercher dans le contenu des partitions</h1>
     </div>
 
+    <!-- Toasts -->
     <div v-if="showHelpToast" class="toast custom-toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
       <div class="d-flex">
         <a href="#">
@@ -16,7 +17,6 @@
         <button @click="closeToast('help')" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
     </div>
-
     <div v-if="showMicroToast" class="toast1 custom-toast1 align-items-center text-bg border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
       <div class="d-flex">
         <a href="#">
@@ -28,20 +28,19 @@
       </div>
     </div>
 
-    <!-- Section de saisie musicale -->
+    <!-- Section pour dessiner la mélodie saisie -->
     <div class="content-wrapper d-flex flex-column mt-5" style="align-items: center; justify-content: center;">
       <div class="search-pattern">
         <h1>Rechercher un motif musical</h1>
-        <!-- Zone où la partition en cours (saisie) est affichée -->
         <div id="music-score"></div>
         <div class="clear_buttons">
-          <button @click="clearAll" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;">Supprimer tout</button>
-          <button @click="removeLastNote" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;">Supprimer la dernière note</button>
-          <button @click="playMelody" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;">Jouer la mélodie</button>
+          <button @click="clearAll" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_all">Supprimer tout</button>
+          <button @click="removeLastNote" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="clear_last_note">Supprimer la dernière note</button>
+          <button @click="playMelody" type="button" class="btn btn-info text-white" style="background-color: #7ab6e0;" id="play_melody">Jouer la mélodie</button>
         </div>
       </div>
 
-      <!-- Contrôles (Volume, Octave, touches, piano, rythme) -->
+      <!-- Contrôle volume, octave et clavier -->
       <div class="wrapper">
         <header>
           <div class="column volume-slider">
@@ -55,9 +54,9 @@
             </div>
             <label id="octave-lb" class="white-label">{{ octave }}</label>
           </div>
-          <div class="column keys-checkbox">
+          <div @click="showKeyBinds" class="column keys-checkbox">
             <span>Touches</span>
-            <input type="checkbox" checked />
+            <input id="checkPics" type="checkbox" checked />
           </div>
           <div class="keyboard-config">
             <button @click="toggleKeyboardConfig" class="btn btn-secondary">
@@ -73,57 +72,57 @@
           </li>
         </ul>
 
-        <!-- Boutons de modification du rythme -->
+        <!-- Modification du rythme -->
         <div class="d-flex gap-4">
           <button class="m-5" id="silence-bt">
             <span>
-              <img src="/src/assets/public/silences_pics/s1.png" height="40" alt="Silence" />
+              <img src="/src/assets/public/silences_pics/s1.png" height="40px" alt="Silence" />
               /
-              <img src="/src/assets/public/silences_pics/s4.png" height="40" alt="Silence" />
+              <img src="/src/assets/public/silences_pics/s4.png" height="40px" />
               /
-              <img src="/src/assets/public/silences_pics/s8.png" height="40" alt="Silence" />
+              <img src="/src/assets/public/silences_pics/s8.png" height="40px" />
               (b)
             </span>
           </button>
           <div class="rhythm-modif">
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('w')" id="whole-bt">
-              <img src="/src/assets/public/notes_pics/1.png" height="50" alt="Whole" />
+              <img src="/src/assets/public/notes_pics/1.png" height="50px" alt="Whole" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('hd')" id="half-dotted-bt">
-              <img src="/src/assets/public/notes_pics/2d.png" height="50" alt="Dotted half" />
+              <img src="/src/assets/public/notes_pics/2d.png" height="50px" alt="Dotted half" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('h')" id="half-bt">
-              <img src="/src/assets/public/notes_pics/2.png" height="50" alt="Half" />
+              <img src="/src/assets/public/notes_pics/2.png" height="50px" alt="Half" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('qd')" id="quarter-dotted-bt">
-              <img src="/src/assets/public/notes_pics/4d.png" height="50" alt="Dotted quarter" />
+              <img src="/src/assets/public/notes_pics/4d.png" height="50px" alt="Dotted quarter" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('q')" id="quarter-bt">
-              <img src="/src/assets/public/notes_pics/4.png" height="50" alt="Quarter" />
+              <img src="/src/assets/public/notes_pics/4.png" height="50px" alt="Quarter" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8d')" id="8th-dotted-bt">
-              <img src="/src/assets/public/notes_pics/8d.png" height="50" alt="Dotted 8-th" />
+              <img src="/src/assets/public/notes_pics/8d.png" height="50px" alt="Dotted 8-th" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('8')" id="8th-bt">
-              <img src="/src/assets/public/notes_pics/8.png" height="50" alt="8-th" />
+              <img src="/src/assets/public/notes_pics/8.png" height="50px" alt="8-th" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16d')" id="16th-dotted-bt">
-              <img src="/src/assets/public/notes_pics/16d.png" height="50" alt="Dotted 16-th" />
+              <img src="/src/assets/public/notes_pics/16d.png" height="50px" alt="Dotted 16-th" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('16')" id="16th-bt">
-              <img src="/src/assets/public/notes_pics/16.png" height="50" alt="16-th" />
+              <img src="/src/assets/public/notes_pics/16.png" height="50px" alt="16-th" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32d')" id="32th-dotted-bt">
-              <img src="/src/assets/public/notes_pics/32d.png" height="50" alt="Dotted 32-th" />
+              <img src="/src/assets/public/notes_pics/32d.png" height="50px" alt="Dotted 32-th" />
             </button>
             <button class="rhythm-modif-bt" @click="changeLastNoteRhythm('32')" id="32th-bt">
-              <img src="/src/assets/public/notes_pics/32.png" height="50" alt="32-th" />
+              <img src="/src/assets/public/notes_pics/32.png" height="50px" alt="32-th" />
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Options avancées -->
+      <!-- Options de recherche avancée -->
       <div class="flex-column" style="display: flex; justify-content: space-between; gap: 20px;">
         <div class="collections-options">
           <label for="collections">Collection dans lesquelles rechercher :</label><br />
@@ -133,20 +132,17 @@
             </option>
           </select>
         </div>
-
         <div class="flex-column" style="display: flex; gap: 20px;">
           <h4 class="text-center">Sélectionnez le type de recherche</h4>
           <div class="flex-row" style="display: flex; gap: 40px;">
             <button @click="searchExact" id="stricte" type="button" class="btn text-white tooltip-lb" style="background-color: #7ab6e0;">Recherche exacte</button>
-            <button @click="searchWithTolerance" id="modereeMelo" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance<br />sur la hauteur des notes</button>
-            <button @click="searchWithRhythmTolerance" id="modereeRythm" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance<br />sur le rythme</button>
+            <button @click="searchWithTolerance" id="modereeMelo" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance <br /> sur la hauteur des notes</button>
+            <button @click="searchWithRhythmTolerance" id="modereeRythm" type="button" class="btn text-white" style="background-color: #7ab6e0;">Recherche avec tolérance <br /> sur le rythme</button>
           </div>
         </div>
-
         <button @click="toggleAdvancedOptions" id="toggleButton2" class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample">
           Options avancées
         </button>
-
         <div style="min-height: 120px;">
           <div class="collapse collapse-vertical" id="collapseWidthExample">
             <div class="card card-body" style="width: 300px;">
@@ -191,28 +187,27 @@
         </div>
       </div>
 
-      <!-- Notifications Toast -->
+      <!-- Toast notifications -->
       <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div v-if="toastVisible" class="toast align-items-center text-bg-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
           <div class="toast-header text-white" style="background-color: #006485;">
             <strong class="me-auto">{{ toastTitle }}</strong>
             <button type="button" class="btn-close" style="background-color: white;" data-bs-dismiss="toast" aria-label="Close"></button>
           </div>
-          <div class="toast-body">
-            {{ toastMessage }}
-          </div>
+          <div class="toast-body">{{ toastMessage }}</div>
         </div>
       </div>
     </div>
 
-    <!-- Résultats de la recherche : affichage des partitions SVG -->
+    <!-- Affichage des résultats de recherche rendus via Verovio -->
     <div v-if="searchResults.length > 0" class="search-results">
       <h2>Partitions trouvées</h2>
-      <div v-for="(result, index) in searchResults" :key="index" class="result-partition" :id="'partition-' + index"></div>
+      <div v-for="(result, index) in searchResults" :key="index" class="result-container">
+        <p>Source : {{ result.source }} – Start : {{ result.start }}</p>
+        <!-- Conteneur pour le SVG rendu par Verovio -->
+        <div :id="'result-svg-' + index" class="result-svg"></div>
+      </div>
     </div>
-
-    <!-- (Optionnel) Tooltip caché -->
-    <div id="tooltip" class="info-note" style="display: none;"></div>
   </div>
 </template>
 
@@ -220,8 +215,7 @@
 import axios from "axios";
 import Collapse from "bootstrap/js/dist/collapse";
 import * as VF from "vexflow";
-const { Renderer, Stave, StaveNote, Formatter, Accidental } = VF;
-import { playNote, stopNote } from "../utils/audioUtils";
+const { Renderer, Stave, StaveNote, Formatter, Accidental, Dot } = VF;
 
 export default {
   data() {
@@ -233,6 +227,7 @@ export default {
       showHelpToast: true,
       showMicroToast: false,
       selectedCollection: "",
+      checkPic: true,
       collections: [],
       searchResults: [],
       pianoKeys: [
@@ -310,7 +305,9 @@ export default {
         k: "C5"
       },
       currentlyPlayingNotes: [],
-      advancedOptionsVisible: false
+      advancedOptionsVisible: false,
+      // Instance de Verovio toolkit (sera initialisée une fois)
+      vtk: null
     };
   },
   computed: {
@@ -323,32 +320,76 @@ export default {
     this.fetchCollections();
     document.addEventListener("keydown", this.handleGlobalKeyDown);
     document.addEventListener("keyup", this.handleGlobalKeyUp);
+    this.initVerovio();
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleGlobalKeyDown);
     document.removeEventListener("keyup", this.handleGlobalKeyUp);
   },
   methods: {
-    // Récupère la liste des collections depuis le backend
+    // Initialise Verovio Toolkit
+    initVerovio() {
+      if (window.verovio) {
+        this.vtk = new window.verovio.toolkit();
+      } else {
+        console.error("Verovio toolkit non disponible !");
+      }
+    },
+    // Charge et rend une partition MEI dans un conteneur donné
+    renderMEI(result, elementId) {
+      if (!this.vtk) return;
+      // Construction de l'URL pour charger le fichier MEI
+      // Supposons que vos fichiers MEI se trouvent dans /files/data/{selectedCollection}/mei/
+      const url = `/files/data/${this.selectedCollection}/mei/${result.source}`;
+      axios
+        .get(url)
+        .then(response => {
+          const meiData = response.data;
+          // Options de rendu (ajustez selon vos besoins)
+          this.vtk.setOptions({ scale: 1.0 });
+          this.vtk.loadData(meiData);
+          const svg = this.vtk.renderToSVG(1, {});
+          // Insérer le SVG dans le conteneur
+          document.getElementById(elementId).innerHTML = svg;
+          // Appliquer la fonction de gradient aux éléments du SVG
+          this.applyGradient(elementId);
+        })
+        .catch(error => {
+          console.error("Erreur en chargeant le fichier MEI", error);
+        });
+    },
+    // Stub pour appliquer un gradient aux notes dans le SVG
+    applyGradient(elementId) {
+      const svgContainer = document.getElementById(elementId);
+      if (!svgContainer) return;
+      // Par exemple, vous pouvez rechercher les éléments de note (à adapter selon le rendu Verovio)
+      const notes = svgContainer.querySelectorAll("[class*='note']");
+      // Appliquer un dégradé ou modifier les styles selon le nombre d'occurrences.
+      notes.forEach(note => {
+        // Exemple simple : changer la couleur de remplissage
+        note.style.fill = "url(#monGradient)"; // Assurez-vous que le gradient existe dans le SVG
+      });
+    },
+    // Méthode pour récupérer les collections
     async fetchCollections() {
       try {
         const response = await axios.get("http://127.0.0.1:5000/collections", {
           headers: { Accept: "application/json" }
         });
         this.collections = response.data.authors;
+        if (this.collections.length > 0 && !this.selectedCollection) {
+          this.selectedCollection = this.collections[0];
+        }
       } catch (error) {
         console.error("Erreur de chargement des collections:", error);
       }
     },
+    // Initialisation de VexFlow (pour dessiner la mélodie saisie)
     initVexFlow() {
       const div = document.getElementById("music-score");
-      if (!div) {
-        console.error("L'élément 'music-score' est introuvable");
-        return;
-      }
+      if (!div) return;
       this.renderer = new Renderer(div, Renderer.Backends.SVG);
-      const width = 500,
-        height = 200;
+      const width = 500, height = 200;
       this.renderer.resize(width, height);
       this.context = this.renderer.getContext();
       this.stave = new Stave(10, 40, width - 20);
@@ -356,9 +397,7 @@ export default {
     },
     updateStaff() {
       const svg = document.querySelector("#music-score svg");
-      if (svg) {
-        svg.innerHTML = "";
-      }
+      if (svg) svg.innerHTML = "";
       this.stave.setContext(this.context).draw();
       if (this.melody.length > 0) {
         Formatter.FormatAndDraw(this.context, this.stave, this.melody);
@@ -376,12 +415,9 @@ export default {
       this.updateStaff();
     },
     keyDown(key) {
-      if (this.currentlyPlayingNotes.length > 1) {
-        console.log("Accord bloqué : trop de notes simultanées.");
-        return;
-      }
+      if (this.currentlyPlayingNotes.length > 1) return;
       this.pressedTimestamp = Date.now();
-      playNote(key.id);
+      // Votre fonction playNote
       this.currentlyPlayingNotes.push(key.id);
     },
     keyUp(key) {
@@ -394,27 +430,18 @@ export default {
       else if (elapsed < 900) duration = "q";
       else if (elapsed < 1200) duration = "h";
       else duration = "w";
-      stopNote(key.id);
+      // Votre fonction stopNote
       const index = this.currentlyPlayingNotes.indexOf(key.id);
       if (index > -1) this.currentlyPlayingNotes.splice(index, 1);
       this.addNote(key.id, duration);
     },
     changeLastNoteRhythm(newDuration) {
-      if (this.melody.length === 0) {
-        console.warn("Aucune note à modifier.");
-        return;
-      }
+      if (this.melody.length === 0) return;
       const lastNote = this.melody.pop();
       const keys = lastNote.getKeys();
       let newNote;
-      if (lastNote.noteType === "r") {
-        newNote = new StaveNote({ keys: ["b/4"], duration: newDuration, type: "r" });
-      } else {
-        newNote = new StaveNote({ keys: keys, duration: newDuration, clef: "treble", auto_stem: true });
-        if (keys[0].includes("#")) {
-          newNote.addModifier(new Accidental("#"), 0);
-        }
-      }
+      newNote = new StaveNote({ keys: keys, duration: newDuration, clef: "treble", auto_stem: true });
+      if (keys[0].includes("#")) newNote.addModifier(new Accidental("#"), 0);
       this.melody.push(newNote);
       this.updateStaff();
     },
@@ -428,7 +455,7 @@ export default {
     },
     playMelody() {
       console.log("Jouer la mélodie");
-      // Ajoutez ici la logique pour jouer la mélodie
+      // Implémenter la lecture si nécessaire
     },
     changeOctave(diff) {
       this.octave += diff;
@@ -439,103 +466,82 @@ export default {
       this.toastVisible = true;
       this.toastTitle = "Recherche exacte";
       this.toastMessage = "Vous effectuez une recherche exacte !";
-      setTimeout(() => (this.toastVisible = false), 3000);
+      setTimeout(() => { this.toastVisible = false; }, 3000);
     },
     searchWithTolerance() {
       this.toastVisible = true;
       this.toastTitle = "Recherche approchée";
       this.toastMessage = "Recherche tolérante sur la hauteur des notes.";
-      setTimeout(() => (this.toastVisible = false), 3000);
+      setTimeout(() => { this.toastVisible = false; }, 3000);
     },
     searchWithRhythmTolerance() {
       this.toastVisible = true;
       this.toastTitle = "Recherche approximative";
       this.toastMessage = "Recherche tolérante sur le rythme des notes.";
-      setTimeout(() => (this.toastVisible = false), 3000);
+      setTimeout(() => { this.toastVisible = false; }, 3000);
     },
     toggleAdvancedOptions() {
       this.advancedOptionsVisible = !this.advancedOptionsVisible;
       const collapseElement = document.getElementById("collapseWidthExample");
-      if (!collapseElement) {
-        console.error("L'élément 'collapseWidthExample' n'a pas été trouvé.");
-        return;
-      }
+      if (!collapseElement) return;
       const bsCollapse = Collapse.getInstance(collapseElement) || new Collapse(collapseElement, { toggle: false });
       this.advancedOptionsVisible ? bsCollapse.show() : bsCollapse.hide();
     },
+    // Recherche avancée : construit et envoie la requête, puis rend les partitions via Verovio
     searchWithAdvancedOptions() {
       if (this.melody.length < 3) {
         console.error("La mélodie doit contenir au moins 3 notes pour lancer la recherche.");
         return;
       }
+
+      // Extraction des conditions pour les 3 premières notes
       const noteConditionsArray = this.melody.slice(0, 3).map((note) => {
-        const key = note.getKeys()[0]; // par ex. "c/4"
-        const [noteLetter, octave] = key.split("/");
-        const noteClass = noteLetter.replace("#", "");
-        let durValue = 8;
-        if (note.duration === "16") durValue = 16;
-        else if (note.duration === "32") durValue = 32;
-        else if (note.duration === "w") durValue = 1;
+        const key = note.getKeys()[0]; // Exemple : "c/4"
+        const [noteLetter, octave] = key.split('/');
+        const noteClass = noteLetter.replace('#', '');
+        let durValue = 8; // Valeur par défaut pour une noire (quarter note)
+        if (note.duration === '16') {
+          durValue = 16;
+        } else if (note.duration === '32') {
+          durValue = 32;
+        } else if (note.duration === 'w') {
+          durValue = 1;
+        }
         return { class: noteClass, octave: parseInt(octave, 10), duration: durValue };
       });
+
+      // Construction de la requête avec WITH DISTINCT
       const query = `
-        MATCH (tp:TopRhythmic)-[:RHYTHMIC]->(m:Measure),
-              (e0:Event)-[n0:NEXT]->(e1:Event)-[n1:NEXT]->(e2:Event),
-              (e0)--(f0:Fact), (e1)--(f1:Fact), (e2)--(f2:Fact)
-        WHERE tp.collection = '${this.selectedCollection}'
-          AND f0.class = '${noteConditionsArray[0].class}' AND f0.octave = ${noteConditionsArray[0].octave} AND f0.dur = ${noteConditionsArray[0].duration}
-          AND f1.class = '${noteConditionsArray[1].class}' AND f1.octave = ${noteConditionsArray[1].octave} AND f1.dur = ${noteConditionsArray[1].duration}
-          AND f2.class = '${noteConditionsArray[2].class}' AND f2.octave = ${noteConditionsArray[2].octave} AND f2.dur = ${noteConditionsArray[2].duration}
-        RETURN DISTINCT e0.source AS source, e0.start AS start
-        LIMIT 10
+      MATCH (tp:TopRhythmic)-[:RHYTHMIC]->(m:Measure),
+      (e0:Event)-[:NEXT]->(e1:Event)-[:NEXT]->(e2:Event),
+      (e0)--(f0:Fact), (e1)--(f1:Fact), (e2)--(f2:Fact)
+WHERE tp.collection = 'Albert Poulain'
+  AND f0.class = 'g' AND f0.octave = 4 AND f0.dur = 8
+  AND f1.class = 'b' AND f1.octave = 4 AND f1.dur = 8
+  AND f2.class = 'd' AND f2.octave = 5 AND f2.dur = 8
+WITH e0, e0.source AS source, e0.start AS start, ID(e0) AS eventId
+RETURN eventId, head(collect({source: source, start: start})) AS result
+ORDER BY eventId
+
       `.trim();
+
       console.log("Envoi de la requête:\n", query);
-      axios
-        .get("http://127.0.0.1:5000/search", {
-          params: { query: query, fuzzy: true }
-        })
-        .then((response) => {
-          console.log("Résultats de la recherche :", response.data);
-          this.searchResults = response.data.results;
-          this.$nextTick(() => {
-            this.searchResults.forEach((result, index) => {
-              this.renderPartition(index, result.source);
-            });
-          });
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la recherche :", error);
-        });
+
+      axios.get("http://127.0.0.1:5000/search", {
+        params: { query: query, fuzzy: true }
+      })
+      .then(response => {
+        console.log("Résultats de la recherche :", response.data);
+        this.searchResults = response.data.results;
+        // Ici, vous pouvez appeler votre fonction pour afficher la partition avec Verovio
+        // par exemple: this.renderWithVerovio(this.searchResults);
+      })
+      .catch(error => {
+        console.error("Erreur lors de la recherche :", error);
+      });
     },
 
-    renderPartition(index, svgUrl) {
-      axios
-        .get(svgUrl)
-        .then((response) => {
-          let svgContent = response.data;
-          svgContent = this.applyGradient(svgContent);
-          const container = document.getElementById("partition-" + index);
-          if (container) {
-            container.innerHTML = svgContent;
-          }
-        })
-        .catch((error) => {
-          console.error("Erreur lors du chargement du SVG :", error);
-        });
-    },
-    applyGradient(svgContent) {
-      // Exemple d'ajout d'un gradient linéaire.
-      const gradientDef = `
-        <defs>
-          <linearGradient id="myGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#ff0000;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#0000ff;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-      `;
-      // Insère la définition du gradient juste après la balise <svg ...>
-      return svgContent.replace(/(<svg[^>]*>)/, `$1${gradientDef}`);
-    },
+
     closeToast(toastType) {
       if (toastType === "help") this.showHelpToast = false;
       else if (toastType === "micro") this.showMicroToast = false;
@@ -543,18 +549,64 @@ export default {
     handleGlobalKeyDown(event) {
       const tag = event.target.tagName.toLowerCase();
       if (tag === "input" || tag === "textarea") return;
-      const note = this.currentMapping[event.key];
+      const mapping = this.currentMapping;
+      const note = mapping[event.key];
       if (note && !event.repeat) this.keyDown({ id: note });
     },
     handleGlobalKeyUp(event) {
       const tag = event.target.tagName.toLowerCase();
       if (tag === "input" || tag === "textarea") return;
-      const note = this.currentMapping[event.key];
+      const mapping = this.currentMapping;
+      const note = mapping[event.key];
       if (note) this.keyUp({ id: note });
     },
     toggleKeyboardConfig() {
       this.keyboardConfig = this.keyboardConfig === "azerty" ? "qwerty" : "azerty";
       console.log("Configuration du clavier :", this.keyboardConfig);
+    },
+    showKeyBinds() {
+      console.log("click");
+      console.log(checkPics.value);
+      console.log(this.checkPic);
+      this.checkPic = false;
+      if (this.checkPic === false) {
+        this.checkPic === true;
+        const pianoKeysHide = [
+        { id: "C4", label: "", color: "white"},
+        { id: "C#4", label: "", color: "black"},
+        { id: "D4", label: "", color: "white"},
+        { id: "D#4", label: "", color: "black"},
+        { id: "E4", label: "", color: "white"},
+        { id: "F4", label: "", color: "white"},
+        { id: "F#4", label: "", color: "black"},
+        { id: "G4", label: "", color: "white"},
+        { id: "G#4", label: "", color: "black"},
+        { id: "A4", label: "", color: "white"},
+        { id: "A#4", label: "", color: "black"},
+        { id: "B4", label: "", color: "white"},
+        { id: "C5", label: "", color: "white"},
+        { id: "C#5", label: "", color: "black"},
+        { id: "D5", label: "", color: "white"},
+        { id: "D#5", label: "", color: "black"},
+        { id: "E5", label: "", color: "white"},
+        { id: "F5", label: "", color: "white"},
+        { id: "F#5", label: "", color: "black"},
+        { id: "G5", label: "", color: "white"},
+        { id: "G#5", label: "", color: "black"},
+        { id: "A5", label: "", color: "white"},
+        { id: "A#5", label: "", color: "black"},
+        { id: "B5", label: "", color: "white"}
+      ];
+        this.pianoKeys = pianoKeysHide;
+        console.log(this.pianoKeys.keys);
+        console.log(this.pianoKeys.label);
+        this.checkPics.value === off;
+      }
+      else {
+        this.checkPic === false;
+        this.pianoKeys === this.pianoKeys;
+      }
+      console.log(this.checkPic);
     }
   }
 };
@@ -577,7 +629,6 @@ export default {
   font-size: 16px;
   text-align: center;
   border: none;
-  outline: none;
   cursor: pointer;
   margin: 10px;
 }
@@ -602,9 +653,13 @@ export default {
   color: black;
   border-bottom: 0.5px solid aqua;
 }
-.result-partition {
-  margin: 20px;
+.result-container {
+  margin: 20px 0;
   border: 1px solid #ccc;
   padding: 10px;
+}
+.result-svg {
+  border: 1px dashed #999;
+  margin-top: 10px;
 }
 </style>
