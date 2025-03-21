@@ -19,5 +19,6 @@ def serve_file(author, subfolder, filename):
         return abort(404)
 
     print(f"✅ Fichier trouvé, envoi : {file_path}")
-    return send_from_directory(data_folder, filename, as_attachment=False, mimetype="application/xml")
+    return send_from_directory(data_folder, filename, as_attachment=False, mimetype="image/svg+xml")
+
 

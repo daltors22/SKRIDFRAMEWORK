@@ -91,7 +91,7 @@ const resetPagination = () => {
 // 📌 Fonction pour construire une URL correcte pour les fichiers SVG
 const getSvgUrl = (path) => {
   console.log(`🛠 Correction de l'URL pour : ${path}`);
-  return `http://127.0.0.1:5000/files${path}`;
+  return `/files${path}`;
 };
 
 // 📌 Gestion des erreurs de chargement des images

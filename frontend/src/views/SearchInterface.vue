@@ -492,7 +492,7 @@ export default {
         return;
       }
 
-      // Extraction des conditions pour les 3 premières notes
+      // Extraction des conditions pour les 3 premières notes (pour la requête de base)
       const noteConditionsArray = this.melody.slice(0, 3).map((note) => {
         const key = note.getKeys()[0];
         const [noteLetter, octave] = key.split('/');
@@ -504,23 +504,35 @@ export default {
         return { class: noteClass, octave: parseInt(octave, 10), duration: durValue };
       });
 
-      // Construction de la requête
-      const query = `
-      MATCH (tp:TopRhythmic)-[:RHYTHMIC]->(m:Measure),
-            (m)-[:HAS]->(e0:Event),
-            (e0)--(f0:Fact),
-            (e0)-[:NEXT]->(e1:Event)--(f1:Fact),
-            (e1)-[:NEXT]->(e2:Event)--(f2:Fact)
-      WHERE tp.collection = '${this.selectedCollection}'
-        AND f0.class = 'g' AND f0.octave = 4 AND f0.dur = 8
-        AND f1.class = 'b' AND f1.octave = 4 AND f1.dur = 8
-        AND f2.class = 'd' AND f2.octave = 5 AND f2.dur = 8
-      RETURN DISTINCT e0.source AS source, e0.start AS start
-      `.trim();
-      if (!this.selectedCollection || this.selectedCollection.trim() === "") {
-        alert("Veuillez sélectionner ou saisir une collection.");
-        return;
+      // Construction de la requête en ajoutant les paramètres si définis
+      let queryPrefix = "";
+      // Par exemple, si vous avez une case "Autoriser les transpositions"
+      if (this.transposeChecked) {
+        queryPrefix += "ALLOW_TRANSPOSITION\n";
       }
+      // Si vous voulez ajouter une tolérance sur la hauteur (pitch), la durée, et un écart
+      if (this.pitchChecked || this.rhythmChecked) {
+        queryPrefix += `TOLERANT pitch=${this.pitchTolerance}, duration=${this.durationFactor}, gap=${this.durationGap}\n`;
+      }
+      // On ajoute aussi le filtre alpha (même s'il vaut 0, c'est explicitement passé)
+      queryPrefix += `ALPHA ${this.alpha}\n`;
+
+      // Maintenant, la requête principale
+      const queryMain = `
+          MATCH (tp:TopRhythmic)-[:RHYTHMIC]->(m:Measure),
+                (m)-[:HAS]->(e0:Event),
+                (e0)--(f0:Fact),
+                (e0)-[:NEXT]->(e1:Event)--(f1:Fact),
+                (e1)-[:NEXT]->(e2:Event)--(f2:Fact)
+          WHERE tp.collection = '${this.selectedCollection}'
+            AND f0.class = 'g' AND f0.octave = 4 AND f0.dur = 8
+            AND f1.class = 'b' AND f1.octave = 4 AND f1.dur = 8
+            AND f2.class = 'd' AND f2.octave = 5 AND f2.dur = 8
+          RETURN DISTINCT e0.source AS source, e0.start AS start
+      `.trim();
+
+      // La requête finale est le préfixe suivi de la requête principale
+      const query = queryPrefix + queryMain;
       console.log("Envoi de la requête:\n", query);
 
       axios.get("http://127.0.0.1:5000/search", {
@@ -529,7 +541,7 @@ export default {
       .then(response => {
         console.log("Résultats de la recherche :", response.data);
         this.searchResults = response.data.results;
-        // Une fois les résultats insérés dans le DOM, rend chaque MEI en SVG via Verovio
+        // Une fois les résultats insérés dans le DOM, on rend chaque SVG
         this.$nextTick(() => {
           this.searchResults.forEach((result, index) => {
             this.renderSVG(result, 'result-svg-' + index);
@@ -540,6 +552,7 @@ export default {
         console.error("Erreur lors de la recherche :", error);
       });
     },
+
     /**
      * Construit l'URL du fichier SVG correspondant à la partition.
      * On suppose que les fichiers SVG se trouvent dans :
@@ -548,8 +561,9 @@ export default {
      */
     svgUrl(meiFilename) {
       const svgFilename = meiFilename.replace(/\.mei$/i, ".svg");
-      return `/files/data/${this.selectedCollection}/svg/${svgFilename}`;
-    },
+      // Assurez-vous d'utiliser le préfixe "/files" ici
+      return `/files${path}.replace(/\s+/g, "-")}/svg/${svgFilename}`;
+    },  
     closeToast(toastType) {
       if (toastType === "help") this.showHelpToast = false;
       else if (toastType === "micro") this.showMicroToast = false;
